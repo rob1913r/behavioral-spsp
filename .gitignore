@@ -1,0 +1,33 @@
+# Ambientes Virtuais e Cache Python
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs e Arquivos do Gurobi
+gurobi.log
+*.lp
+*.sol
+
+# Dados gerados dinamicamente (Instancias e Resultados)
+data/instances/
+data/results/
+
+# Graficos gerados dinamicamente pelo plot_gen.py
+docs/paper/figures/*.png
+
+# Arquivos temporarios do compilador LaTeX
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+
+# Arquivos do Sistema Operacional
+.DS_Store
+Thumbs.db
