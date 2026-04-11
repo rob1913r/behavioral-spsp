@@ -207,7 +207,7 @@ def generate_instances():
     # =====================================================================
     exp5_dir = os.path.join(BASE_OUTPUT_DIR, "exp5_surplus")
     os.makedirs(exp5_dir, exist_ok=True)
-    print(f"-> Gerando Grupo 5: Compensação Técnica vs Comportamento (Salvando em: {exp5_dir})...")
+    print(f"-> Gerando Grupo 5: Compensação Técnica vs Comportamento (Salvando em: {exp5_dir})...\n")
     
     for tech_lvl in [0.3, 0.5, 0.7, 0.9, 1.0]: 
         for r in range(30):
@@ -234,4 +234,3 @@ def generate_instances():
 
 if __name__ == "__main__":
     generate_instances()
-    print("\n")

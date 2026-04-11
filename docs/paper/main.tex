@@ -447,26 +447,39 @@ nas piores formulações do conjunto, evidenciando o aumento da profundidade da
 
 \subsection{Evolução sob o Efeito de Ruído Comportamental}
 
-A análise dos quatro cenários de ruído revela na prática as falhas dos 
-métodos de planejamento que ignoram o fator humano. Na Figura 
-\ref{fig:g07_noise}, a progressão do cenário \textit{Baseline} (que 
-gera estimativas otimistas por desconsiderar o perfil da equipe) 
-para o cenário Crítico resulta em uma forte inflação no \textit{makespan}, 
-que sobe de uma média de 25 para mais de 40 dias de projeto.
+A análise empírica dos quatro cenários de ruído comportamental traz um 
+resultado interessante sobre a dinâmica das equipes e a resposta do modelo 
+matemático. Conforme ilustrado na Figura \ref{fig:g07_noise}, a transição 
+do cenário \textit{Baseline} (uma equipe ideal e sem atritos) para o cenário 
+\textit{Natural} (perfis estocásticos realistas) resultou em prazos de entrega 
+equivalentes. Esse empate sugere um reflexo direto de como a formulação
+matemática interage com as decisões do otimizador.
 
-Essa discrepância se agrava de forma drástica no cenário Extremo,
-quando o modelo obriga a alocação de tarefas a desenvolvedores com perfis 
-comportamentais diametralmente opostos ao que a atividade exige.
-Conforme ilustrado pela Figura \ref{fig:g08_noise}, 
-os prazos saltam para margens próximas a 80 dias de trabalho.
+O modelo proposto utiliza uma função de penalidade cúbica, isso significa que,
+para desvios comportamentais sutis (dentro da Zona de Aceitação, $x_{ij} \le 0.3$), 
+o impacto gerado no tempo de execução é matematicamente absorvido. Somado a 
+isso, o algoritmo MILP atua de forma a distribuir as tarefas de maneira a 
+maximizar a afinidade sociotécnica de cada alocação. Na prática, o otimizador 
+consegue contornar os atritos cotidianos, permitindo que uma equipe real 
+produza com a mesma eficiência de um cenário idealizado.
 
-Durante os testes, esse nível de desalinhamento gerou um impacto severo: 
-as tarefas passaram a consumir tanto tempo que estouraram o limite máximo 
-de horas de uma \textit{sprint} normal. Para que o otimizador conseguisse 
-encontrar uma solução matemática e não declarasse o projeto inviável, 
-foi necessário desativar temporariamente a restrição de capacidade 
-($Cap_{is}$). O crescimento médio do Erro Comportamental ($EC$) que causou 
-essa explosão de tempo pode ser analisado na Figura \ref{fig:g09_noise}.
+Contudo, existe um limite matemático e prático para essa compensação. Quando 
+o projeto exige alocações mais complexas e o grupo não possui perfis 
+suficientemente compatíveis, o otimizador perde suas rotas de fuga. No cenário 
+\textit{Crítico}, o modelo não consegue mais evitar as penalidades, o que 
+provoca um aumento considerável no \textit{makespan}, passando de uma média 
+de 28 para mais de 40 dias de duração.
+
+Esse efeito de degradação fica ainda mais evidente no cenário \textit{Extremo}, 
+onde as tarefas são obrigatoriamente alocadas a perfis diametralmente opostos. 
+Como mostra a Figura \ref{fig:g08_noise}, os prazos quase dobram, beirando os 
+80 dias. Nesse ponto, a incompatibilidade foi tão alta que o tempo de 
+execução ajustado ($T_{ij}$) chegou a estourar o limite de horas nominais de 
+uma \textit{sprint}. Para que o solver conseguisse encontrar uma solução válida 
+e não declarasse o projeto inviável, foi necessário flexibilizar temporariamente 
+a restrição de capacidade ($Cap_{is}$). O crescimento do Erro Comportamental 
+($EC$) que causou esse impacto na equipe pode ser observado na 
+Figura \ref{fig:g09_noise}.
 
 \begin{figure}[H]
     \centering
@@ -494,24 +507,20 @@ essa explosão de tempo pode ser analisado na Figura \ref{fig:g09_noise}.
 \subsection{Planejamento de Capacidade Tática e a Lei de Brooks}
 
 Do ponto de vista gerencial, o modelo atua como uma ferramenta direta de 
-suporte à decisão. A expansão da matriz de capacidade (Figura \ref{fig:g10_brooks}) 
-gera um mapa de calor tático que permite aos líderes de projeto avaliarem 
-rapidamente o custo-benefício de redimensionar a equipe. Fica evidente, 
-por exemplo, que expandir o quadro de 3 para 4 desenvolvedores reduz o 
-\textit{makespan} de forma expressiva e vantajosa. Em contrapartida, 
-investir recursos para saltar de 6 para 8 profissionais traz um ganho 
-baixo no prazo final do projeto.
+suporte à decisão. O mapa de calor tático (Figura \ref{fig:g10_brooks}) 
+permite aos líderes avaliarem rapidamente o custo-benefício de redimensionar 
+a equipe. Fica evidente, por exemplo, que expandir o quadro de 3 para 4 
+desenvolvedores reduz o \textit{makespan} de forma expressiva. Em contrapartida, 
+saltar de 6 para 8 profissionais traz um ganho baixo no prazo final.
 
-Esse esgotamento da eficiência, isolado na Figura \ref{fig:g11_brooks} para a demanda 
-de $N=50$ tarefas, sugere a validade da Lei de Brooks através de 
-dados quantitativos. A lei postula que adicionar força de trabalho a um 
-projeto esbarra em limites de paralelismo e no aumento do custo 
-de comunicação. O algoritmo replicou esse fenômeno empírico: 
-a partir de um determinado tamanho de equipe, a curva de tempo torna-se 
-uma assíntota. Isso sugere aos gestores que as dependências do código 
-criam um teto onde, a partir de um determinado tamanho de equipe,
-adicionar mais pessoas deixa de gerar ganhos reais na velocidade
-de entrega.
+Esse esgotamento da eficiência, isolado na Figura \ref{fig:g11_brooks} para 
+a demanda de $N = 50$ tarefas, evidencia a Lei de Brooks de forma quantitativa. 
+A lei postula que adicionar força de trabalho a um projeto esbarra em limites 
+de paralelismo e no aumento do custo de comunicação. O algoritmo replicou esse 
+fenômeno empírico: a partir de um determinado tamanho de equipe, a curva de 
+tempo torna-se uma assíntota. Isso indica aos gestores que as dependências do 
+projeto criam um teto onde adicionar mais pessoas deixa de gerar ganhos reais 
+na velocidade de entrega.
 
 \begin{figure}[H]
     \centering
