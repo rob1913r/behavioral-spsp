@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Módulo de Geração de Gráficos e Visualizações Analíticas (Bilíngue).
+Módulo de Geração de Gráficos e Visualizações Analíticas.
 
 Este script é responsável por renderizar os gráficos utilizados no artigo (G01 a G15).
 Ele gera duas baterias de imagens automaticamente:
@@ -118,7 +118,7 @@ LANG_STR = {
     }
 }
 
-print(f"\nIniciando pipeline de geração de gráficos Bilíngue...")
+print(f"\nIniciando pipeline de geração de gráficos...")
 
 # Carrega o CSV apenas uma vez, se existir
 df = None
@@ -135,7 +135,7 @@ for lang in ['pt', 'en']:
     OUTPUT_DIR = S['out_dir']
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
-    print(f"\n---> Renderizando gráficos em [{lang.upper()}] (Destino: '{OUTPUT_DIR}')")
+    print(f"---> Renderizando gráficos em [{lang.upper()}] (Destino: '{OUTPUT_DIR}')")
     
     x = np.linspace(0, 1, 500)
     k_fixed = 5.0
@@ -338,4 +338,4 @@ for lang in ['pt', 'en']:
     # Fecha todos os plots da rodada para liberar memória antes do próximo idioma
     plt.close('all')
 
-print("\n[OK] Pipeline finalizado. Gráficos gerados com sucesso.")
+print("")

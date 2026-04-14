@@ -19,7 +19,8 @@ def clean_directories():
     dirs_to_clean = [
         os.path.join(BASE_DIR, "data", "instances"),
         os.path.join(BASE_DIR, "data", "results"),
-        os.path.join(BASE_DIR, "docs", "paper", "figures")
+        os.path.join(BASE_DIR, "docs", "paper-pt", "figures"),
+        os.path.join(BASE_DIR, "docs", "paper-en", "figures")
     ]
     
     for d in dirs_to_clean:
@@ -46,26 +47,26 @@ def main():
     print("=" * 60)
 
     print("\n[1/5] Preparando o ambiente e limpando dados antigos...")
-    clean_directories()
+    #clean_directories()
     print("[OK] Limpeza concluída.")
 
     # O comando sys.executable garante que ele use o mesmo Python que rodou o script
     python_exe = sys.executable
 
-    run_command(
-        [python_exe, "-m", "pip", "install", "-r", "requirements.txt", "--quiet"],
-        "[2/5] Verificando e instalando dependencias..."
-    )
+    #run_command(
+    #    [python_exe, "-m", "pip", "install", "-r", "requirements.txt", "--quiet"],
+    #    "[2/5] Verificando e instalando dependencias..."
+    #)
 
-    run_command(
-        [python_exe, os.path.join("src", "instance_gen.py")],
-        "[3/5] Gerando as instancias parametricas para o modelo..."
-    )
+    #run_command(
+    #    [python_exe, os.path.join("src", "instance_gen.py")],
+    #    "[3/5] Gerando as instancias parametricas para o modelo..."
+    #)
 
-    run_command(
-        [python_exe, os.path.join("src", "optimizer.py")],
-        "[4/5] Resolvendo os modelos matematicos..."
-    )
+    #run_command(
+    #    [python_exe, os.path.join("src", "optimizer.py")],
+    #    "[4/5] Resolvendo os modelos matematicos..."
+    #)
 
     run_command(
         [python_exe, os.path.join("src", "plot_gen.py")],
