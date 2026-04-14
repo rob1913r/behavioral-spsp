@@ -25,20 +25,23 @@ behavioral-spsp/
 ├── README.md                # Documentação principal
 ├── LICENSE                  # Licença MIT
 ├── requirements.txt         # Dependências do projeto (Python)
-├── run_pipeline.py         # Pipeline de automação (Geração -> Otimização -> Gráficos)
+├── run_pipeline.py          # Pipeline de automação (Geração -> Otimização -> Gráficos)
 │
 ├── src/                     # Código-fonte
 │   ├── instance_gen.py      # Gerador paramétrico de instâncias JSON
 │   ├── optimizer.py         # Solver MILP (Modelagem via Gurobi)
-│   └── plot_gen.py          # Gerador de gráficos e análises visuais
+│   └── plot_gen.py          # Gerador de gráficos bilíngue e análises visuais
 │
 ├── data/                    # Dados isolados do código
 │   ├── instances/           # Subpastas com instâncias sintéticas geradas
 │   └── results/             # Métricas e resultados extraídos do otimizador
 │
 └── docs/                    # Documentação e Artigo Científico
-    └── paper/               # Código-fonte LaTeX do artigo e bibliografia
-        └── figures/         # Gráficos renderizados consumidos pelo PDF
+    ├── paper-pt/            # Código-fonte LaTeX e figuras do artigo em Português
+    │   └── figures/         # Gráficos renderizados com legendas em PT
+    └── paper-en/            # Código-fonte LaTeX e figuras do artigo em Inglês
+        └── figures/         # Gráficos renderizados com legendas em EN
+```
 
 ## ⚙️ Pré-requisitos e Instalação
 
@@ -61,12 +64,14 @@ python run_pipeline.py
 ```
 
 **O que o pipeline automatizado faz:**
-1. Prepara e limpa os diretórios de dados dinâmicos (`data/` e `docs/paper/figures/`);
+1. Prepara e limpa os diretórios de dados dinâmicos (`data/`, `docs/paper-pt/figures/` e `docs/paper-en/figures/`);
 2. Executa `src/instance_gen.py` para criar instâncias controladas (grupos de escalabilidade, ruído, etc.);
 3. Executa `src/optimizer.py`, que carrega os dados no Gurobi, processa as restrições sociotécnicas e exporta as métricas para um arquivo unificado em `data/results/metrics.csv`;
-4. Executa `src/plot_gen.py` para analisar os resultados e plotar os gráficos.
+4. Executa `src/plot_gen.py` para analisar os resultados e plotar automaticamente os gráficos nas versões em Português (`docs/paper-pt/figures/`) e Inglês (`docs/paper-en/figures/`) para consumo do LaTeX.
 
-Para compilar o PDF final da pesquisa, basta acessar a pasta `docs/paper/` e processar o arquivo `main.tex` em qualquer compilador **LaTeX** (como o *TeXworks* ou *Overleaf*).
+Para compilar o PDF final da pesquisa, você pode processar os arquivos em qualquer compilador **LaTeX** (como o *TeXworks* ou *Overleaf*):
+- **Para a versão em Português:** Acesse a pasta `docs/paper-pt/` e compile o arquivo `main_pt.tex`.
+- **Para a versão em Inglês:** Acesse a pasta `docs/paper-en/` e compile o arquivo `main_en.tex`.
 
 ## 📄 Licença
 

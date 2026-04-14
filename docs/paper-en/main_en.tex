@@ -1,0 +1,636 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{sbpo-template}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage[hidelinks]{hyperref}
+\usepackage[square]{natbib}
+\usepackage{indentfirst}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% --- PACKAGES AND COMMANDS TO SILENCE WARNINGS ---
+\usepackage{lmodern}   
+\usepackage{microtype} 
+\vbadness=10000
+\hbadness=10000
+\hfuzz=10000pt
+% ------------------------------------------------
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\includegraphics[scale=0.05]{sbpo-header.png}}
+\renewcommand{\headruleskip}{-1mm}
+\setlength\headheight{86pt}
+\addtolength{\textheight}{-86pt}
+\setlength{\headsep}{5mm}
+\setlength{\footskip}{4.08003pt}
+
+\begin{document}
+
+\title{MAKESPAN OPTIMIZATION IN SOFTWARE PROJECTS: \\ 
+BEHAVIORAL AND TECHNICAL ALIGNMENT} 
+
+\maketitle
+\thispagestyle{fancy}
+
+\author{
+\name{Roberto Júnior Cassimiro Campolina}
+\institute{Operations Research and Complex Systems Lab (ORCS)}
+\iaddress{Universidade Federal de Minas Gerais (UFMG), Belo Horizonte, MG, Brazil}
+\email{robertojuniorme@gmail.com}
+}
+
+\author{
+\name{André Costa Batista}
+\institute{Departamento de Engenharia Elétrica}
+\iaddress{Universidade Federal de Minas Gerais (UFMG), Belo Horizonte, MG, Brazil}
+\email{andre-costa@ufmg.br}
+}
+
+\vspace{8mm}
+
+\begin{abstract}
+The management of development activities in software projects can be a complex
+tactical challenge, where the allocation of tasks to human resources can become
+a bottleneck. Task allocation in software projects is traditionally modeled
+considering only technical constraints. This paper proposes a Mixed-Integer
+Linear Programming (MILP) model for the Software Project Scheduling Problem (SPSP)
+that incorporates behavioral compatibility. The formulation penalizes misalignment
+through a cubic polynomial function of Solides profiles, allied with a technical
+bonus. Solving 1380 instances in the Gurobi Optimizer demonstrates that cognitive
+noise increases the makespan and mathematically validates Brooks's Law, providing
+a relevant metric for the project's tactical planning.
+\end{abstract}
+
+\bigskip
+\begin{keywords}
+Operations Research. Mixed-Integer Programming. Software Engineering. 
+Agile Management. SPSP.
+
+\bigskip
+\noindent{\textbf{Paper topics:} OR in Industry. Project Management. 
+Combinatorial Optimization.}
+\end{keywords}
+ 
+\newpage
+\section{Introduction} 
+ 
+The software development industry has consolidated itself as one of the main 
+pillars of the modern global economy, characterized by rapid delivery cycles 
+and dynamic requirements. Unlike traditional manufacturing environments, 
+where machine processing is deterministic, the software life cycle is 
+fundamentally dependent on human capital. Efficiently managing these resources 
+is a challenge in software factories, where professional allocation and 
+architectural code dependencies affect the project schedule \citep{dikert2016, faria2022}.
+
+In Operations Research literature, this problem is formalized as the Software 
+Project Scheduling Problem (SPSP), a specialized variant of the classic 
+\textit{Resource-Constrained Project Scheduling Problem} (RCPSP). Given the 
+combinatorial nature of task assignments under precedence and capacity 
+constraints, the SPSP is classified as strongly NP-Hard \citep{blazewicz1983, kolisch1999}. 
+A comprehensive review of SPSP, detailing the different approaches and resolution 
+methods explored in the literature, can be found in the survey by \citet{vegavelazquez2018}.
+
+Mathematical models for SPSP often differentiate teams strictly by their 
+technical skills \citep{alba2007, chicano2011, pritsker1969}. This simplification 
+does not account for cognitive and behavioral factors inherent to software 
+engineering \citep{demarco1987}. Furthermore, the non-linearity of productivity 
+in software projects is documented in empirical literature. \citet{brooks1975} 
+formulated Brooks's Law, which postulates that adding manpower to a late 
+software project tends to make it even later, due to the exponential growth 
+in communication \textit{overhead}\footnote{Refers to the time and effort 
+consumed in exchanging information and aligning among team members. As the 
+number of members in the same activity increases, the complexity of communication 
+lines grows exponentially, generating progressive losses in net productivity.} 
+and the restrictive topology of precedences. Although a recurring concept in 
+agile management, this dynamic is rarely structured as an endogenous variable 
+in analytical MILP models \citep{ryan2013, acuna2006}.
+
+This paper aims to represent behavioral alignment through a numerical component 
+within a mathematical optimization model. Using the Solides psychometric 
+methodology, which categorizes professionals into Executors, Communicators, 
+Planners, and Analysts \citep{costa2018}, the model adjusts a task's nominal 
+execution time based on the psychological compatibility and technical surplus 
+of the individual. The study integrates behavioral profiles into an SPSP 
+formulation, evaluates a cubic polynomial penalty function, analyzes the 
+mathematical effects of Brooks's Law, and explores tactical capacity planning 
+through a heatmap.
+
+The remainder of this paper is organized as follows. Section 2 details the 
+mathematical modeling and the time adjustment function. Section 3 describes 
+the experimental methodology and the generation of computational instances. 
+Section 4 presents the results obtained by the optimizer and the managerial 
+analyses. Finally, Section 5 concludes the work and proposes guidelines for 
+future research.
+
+\section{Mathematical Modeling}
+
+The central premise of this model is that technical productivity is impacted 
+by the developer's profile. The proposed MILP formulation calculates an adjusted 
+execution time \textit{a priori} for each task-developer pair based on combined 
+technical and behavioral characteristics.
+
+\subsection{Sets, Parameters, and Variables}
+
+\vspace{0.3cm}
+\noindent\textbf{Sets and Indices}
+\begin{center}
+    \begin{tabular}{p{2.5cm} p{12cm}}
+        $M$ & Set of developers, indexed by $i \in \{1, \dots, |M|\}$. \\
+        $N$ & Set of tasks in the \textit{backlog}, indexed by $j, k \in \{1, \dots, |N|\}$. \\
+        $S_{max}$ & Set of available \textit{sprints}, indexed by $s \in \{1, \dots, |S_{max}|\}$. \\
+        $H$ & Set of technical skills, indexed by $h \in \{1, \dots, |H|\}$. \\
+        $P$ & Set of the 4 behavioral quadrants, indexed by $p \in \{1, \dots, 4\}$.
+    \end{tabular}
+\end{center}
+
+\vspace{0.3cm}
+\noindent\textbf{Parameters}
+\begin{center}
+    \begin{tabular}{p{2.5cm} p{12cm}}
+        $Ht_{jh}$ & Minimum technical level $h$ required by task $j$. \\
+        $Hd_{ih}$ & Current technical level of developer $i$ in skill $h$. \\
+        $Pt_{jp}$ & Fraction of behavioral profile $p$ required for task $j$. \\
+        $Pd_{ip}$ & Fraction of behavioral profile $p$ of developer $i$. \\
+        $T^{base}_j$ & Estimated base time to complete task $j$ (hours). \\
+        $Cap_{is}$ & Available capacity (hours) of developer $i$ in \textit{sprint} $s$. \\
+        $\delta_s$ & Duration of each \textit{sprint} in calendar days. \\
+        $j_{lab}$ & Usable working hours per day. \\
+        $Pred(j)$ & Set of tasks that strictly precede task $j$.
+    \end{tabular}
+\end{center}
+
+\vspace{0.3cm}
+\noindent\textbf{Decision Variables}
+\begin{center}
+    \begin{tabular}{p{2.5cm} p{12cm}}
+        $x_{ijs} \in \{0, 1\}$ & 1 if task $j$ is assigned to developer $i$ in \textit{sprint} $s$, 0 otherwise. \\
+        $y_s \in \{0, 1\}$ & 1 if \textit{sprint} $s$ is used, 0 otherwise. \\
+        $TF_s \ge 0$ & Continuous variable of the accumulated final time (days) in \textit{sprint} $s$. \\
+        $T^{max} \ge 0$ & Continuous variable representing the project's \textit{Makespan}.
+    \end{tabular}
+\end{center}
+
+\subsection{Dynamic Time Calculation ($T_{ij}$)}
+
+The numerical adjustment of the execution time is structured in three stages 
+that quantify the impact of human variables on productivity:
+
+\vspace{0.2cm}
+\noindent\textbf{Stage 1: Technical Surplus ($ET_{ij}$)} \\
+Evaluates the surplus technical qualification of the assigned resource. If the 
+developer exceeds the minimum stipulated requirement, task execution is accelerated. 
+A scalar factor of $0.5$ is incorporated into the equation as a damping 
+coefficient, smoothing the productivity gain to be more consistent with 
+practical reality:
+\begin{equation}
+    ET_{ij} = 0.5 \cdot \left[ \frac{1}{|H|} \sum_{h \in H} \left(\max(0, Hd_{ih} - Ht_{jh})\right)^2 \right] \quad \forall i \in M, \forall j \in N
+\end{equation}
+
+\vspace{0.2cm}
+\noindent\textbf{Stage 2: Behavioral Error ($EC_{ij}$)} \\
+To quantify the cognitive wear caused by psychological misalignment, the absolute 
+difference between the quadrants of the behavioral profile required by the task 
+and the developer's profile, denoted by $\psi_{ij}$, is initially calculated. 
+The division by $2$ acts as a normalization factor: since behavioral profiles 
+are represented by proportional distributions (whose vector sum is always $1.0$), 
+the maximum possible absolute difference between two diametrically opposed 
+profiles results in $2.0$. This division ensures that the metric $\psi_{ij}$ 
+strictly converges to the continuous interval of $[0, 1]$. Next, a polynomial 
+function of order $n$ with a gain multiplier $k$ is applied to penalize more 
+severe misalignments. These parameters were empirically defined as $n=3$ and 
+$k=5.0$, a formulation whose justification is detailed in Section 4.1:
+\begin{equation}
+    \psi_{ij} = \frac{1}{2} \sum_{p \in P} |Pd_{ip} - Pt_{jp}| \quad \forall i \in M, \forall j \in N
+\end{equation}
+\begin{equation}
+    EC_{ij} = 5.0 \cdot (\psi_{ij})^3 \quad \forall i \in M, \forall j \in N
+\end{equation}
+
+\vspace{0.2cm}
+\noindent\textbf{Stage 3: Adjusted Execution Time ($T_{ij}$)} \\
+The final composition consolidates the simultaneous interaction of variables 
+over the nominal time, assigning the efficiency gain provided by technical 
+qualification and the penalty generated by behavioral inadequacy:
+\begin{equation}
+    T_{ij} = T^{base}_j \times (1.0 + EC_{ij} - ET_{ij}) \quad \forall i \in M, \forall j \in N
+\end{equation}
+
+\subsection{Objective Function and Constraints}
+
+The model minimizes the final delivery schedule of the project, represented by 
+the \textit{makespan}:
+\begin{equation}
+    \min T^{max}
+\end{equation}
+
+The task allocation is subject to the operational and logical constraints 
+described below. The first constraint ensures that each task is processed 
+exactly once and assigned to a single developer in the project cycle:
+\begin{equation}
+    \sum_{i \in M} \sum_{s \in S_{max}} x_{ijs} = 1 \quad \forall j \in N
+\end{equation}
+
+The qualification constraint prevents assignment if the designated resource does 
+not possess the minimum technical knowledge required by the task in all skills:
+\begin{equation}
+    \sum_{i \in M} \sum_{s \in S_{max}} Hd_{ih} \cdot x_{ijs} \ge Ht_{jh} \quad \forall j \in N, \forall h \in H
+\end{equation}
+
+The workload is limited by the capacity constraint, which restricts the total 
+hours worked by a developer to their available limit in the respective \textit{sprint}:
+\begin{equation}
+    \sum_{j \in N} T_{ij} \cdot x_{ijs} \le Cap_{is} \quad \forall i \in M, \forall s \in S_{max}
+\end{equation}
+
+To preserve the code topology, the structural precedence constraint forces 
+successor tasks to be scheduled in \textit{sprints} strictly after their 
+predecessors:
+\begin{equation}
+    \sum_{i \in M} \sum_{s \in S_{max}} s \cdot x_{ijs} \ge \sum_{i \in M} \sum_{s \in S_{max}} s \cdot x_{iks} + 1 \quad \forall j \in N, \forall k \in Pred(j)
+\end{equation}
+
+The \textit{sprint} activation logic ensures that tasks are only allocated in 
+active cycles and prevents the emergence of inactive gaps (holes) in the 
+chronological planning:
+\begin{equation}
+    \sum_{i \in M}\sum_{j \in N} x_{ijs} \ge y_s \quad \forall s \in S_{max}
+\end{equation}
+\begin{equation}
+    x_{ijs} \le y_s \quad \forall i \in M, \forall j \in N, \forall s \in S_{max}
+\end{equation}
+\begin{equation}
+    y_{s-1} \ge y_s \quad \forall s \in S_{max} \setminus \{1\}
+\end{equation}
+
+The allocated effort hours are converted into calendar days, structuring the 
+continuous temporal progression of work throughout the \textit{sprint}:
+\begin{equation}
+    \delta_s \cdot (s-1) \cdot y_s + \frac{1}{j_{lab}} \sum_{j \in N} x_{ijs} \cdot T_{ij} \le TF_s \quad \forall i \in M, \forall s \in S_{max}
+\end{equation}
+
+Finally, the main variable of interest of the objective function is formalized, 
+ensuring that the \textit{makespan} encompasses the completion time of the 
+last used \textit{sprint}:
+\begin{equation}
+    TF_s \le T^{max} \quad \forall s \in S_{max}
+\end{equation}
+
+\section{Experimental Methodology}
+
+To guarantee statistical reliability, a Python generator instantiated the input 
+matrices pseudo-randomly. The dataset comprises 1380 instances, ensuring 30 
+samples per scenario, with nominal times ($T^{base}_j$) projected for deadlines 
+of 30 to 100 calendar days. 
+
+In all experiments, the team size ($M$) was restricted to the interval of 3 
+to 8 members. This range reflects the real standard for agile \textit{squads}, 
+given that the literature demonstrates that teams with more than 9 members 
+suffer drastic productivity drops due to excessive communication and 
+coordination \cite{kniberg2012, schwaber2017}. The instances were categorized 
+into five groups:
+
+\begin{itemize}
+    \item \textbf{MILP Scalability:} Examines the computational effort and 
+    combinatorial growth of the optimization model by progressively sizing the 
+    task \textit{backlog} ($N \in [10, 80]$), keeping the team fixed at the 
+    median value of $M = 5$.
+    
+    \item \textbf{Behavioral Noise:} Evaluates the impact on the deadline under 
+    four allocations: \textit{Baseline}, Natural, Critical, and Extreme.
+    
+    \item \textbf{Brooks's Law:} Analyzes tactical capacity planning by 
+    iterating the task volume ($N \in [25, 60]$) and the team size 
+    ($M \in [3, 8]$).
+
+    \item \textbf{Precedence Density:} Quantifies how the proportion of 
+    interdependence between tasks impacts the total \textit{makespan}, 
+    identifying the saturation point where the project becomes infeasible 
+    within the \textit{sprint} budget.
+
+    \item \textbf{Technical Surplus:} Evaluates the productivity gains of 
+    highly qualified teams in contrast to behavioral noise, identifying the 
+    break-even point between seniority and psychological alignment.
+\end{itemize}
+
+The formulations were processed through the Gurobi Optimizer, executed in a 
+computational environment equipped with a 13th Gen Intel Core i7-1360P 
+processor (2.20 GHz) and 16 GB of RAM. In order to provide a balanced trade-off 
+between convergence quality and response time in instances with more robust 
+dimensionality, the global maximum time limit was set to 3600 seconds (one 
+hour), with a relative optimality tolerance (MIP Gap) established at 0.1\%.
+
+To ensure full reproducibility of the experiments and methodological 
+transparency, the complete Python source code (including the MILP modeling, 
+the instance generator, and the visual analysis scripts), as well as the raw 
+output data, are publicly available in the project's official repository, 
+accessible through the link: \url{https://github.com/rob1913r/behavioral-spsp}.
+
+\section{Results and Discussion}
+
+This section presents the computational results derived from solving the 
+instances in the optimizer. The discussion begins with the evaluation of the 
+theoretical basis of the adopted penalty function and the computational 
+efficiency of the model across different task volumes. Following this, the 
+data is explored to quantify the impact of behavioral noise on the 
+\textit{makespan}, mathematically validate the capacity constraints imposed 
+by Brooks's Law, and investigate the empirical compensation relationship 
+between technical surplus and psychological alignment.
+
+\subsection{Theoretical Modeling of the Behavioral Penalty}
+
+The choice of the cubic function for the Behavioral Error was based on the 
+progressive analysis of misalignment. Figure \ref{fig:g01_just} divides the 
+error domain $\psi \in [0, 1]$ into the Acceptance (0.0 to 0.3), Critical 
+(0.3 to 0.7), and Extreme (0.7 to 1.0) zones. It was noted that linear or 
+quadratic functions punish small deviations excessively, while quartic 
+functions underestimate moderate friction. The cubic function proved to be 
+more realistic: it absorbs mild divergences and imposes steep penalties 
+only upon reaching the critical range. 
+
+With the empirical multiplier $k=5.0$ (Figure \ref{fig:g02_calib}), the model 
+reflects two realities: in the critical zone, time suffers severe inflations 
+(up to $3\times$ the nominal value), representing real bottlenecks in 
+communication and rework. In the extreme zone, the penalty reaches the 
+practical infeasibility threshold ($6\times$), mirroring the breaking point 
+where the task exceeds the \textit{sprint's} capacity limit and forces the 
+mathematical rejection of the assignment.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/G01_Justificativa_Matematica.png}
+        \caption{Zones of impact by polynomial function.}
+        \label{fig:g01_just}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/G02_Calibracao_K.png}
+        \caption{Calibration of the cubic multiplier $k$.}
+        \label{fig:g02_calib}
+    \end{minipage}
+\end{figure}
+
+\subsection{Scalability and Computational Efficiency of the Optimizer}
+
+The advancement of computational effort and its adherence to NP-Hard 
+classifications can be clearly observed in light of the escalation of task 
+volume (Figures \ref{fig:g03_tasks} and \ref{fig:g04_tasks}) and the 
+quantitative increase of active decision variables inside the solver (Figures 
+\ref{fig:g05_vars} and \ref{fig:g06_vars}).
+
+For instances containing up to 40 independent tasks, the matrix converged in 
+less than 5 seconds of processing. However, as complexity approached the $N=80$ 
+tasks mark, a sharp transition in the slope of the curve is noticed. The 
+execution time required to prove the 0.1\% optimality reached margins close to 
+one minute in the worst formulations of the set, highlighting the increased 
+depth of the \textit{Branch and Bound} algorithm tree.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/G03_Scalability_Boxplot_Tasks.png}
+        \caption{Computational effort by Tasks.}
+        \label{fig:g03_tasks}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/G04_Scalability_Line_Tasks.png}
+        \caption{Time Growth vs. Tasks.}
+        \label{fig:g04_tasks}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/G05_Scalability_Boxplot_Vars.png}
+        \caption{Time by quantity of Variables.}
+        \label{fig:g05_vars}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/G06_Scalability_Line_Vars.png}
+        \caption{Time Growth vs. Variables.}
+        \label{fig:g06_vars}
+    \end{minipage}
+\end{figure}
+
+\subsection{Evolution under the Effect of Behavioral Noise}
+
+The \textit{Baseline} scenario acts as a mathematical lower bound of time for 
+the schedule. It represents an ``ideal team'', characterized by an abstraction 
+where the developers' profiles are perfectly identical to the tasks' requirements 
+($Pd_{ip} = Pt_{jp}$), nullifying the behavioral error. According to Figure 
+\ref{fig:g07_noise}, the transition from this scenario to the \textit{Natural} 
+one (stochastic profiles) resulted in equivalent delivery deadlines. This 
+occurs because the cubic penalty function absorbs subtle deviations within the 
+Acceptance Zone ($\psi_{ij} \le 0.3$). Consequently, the MILP algorithm manages 
+to distribute the tasks so adherently that it nullifies the inherent noise of 
+a real team, matching the efficiency of a perfect scenario.
+
+However, there is a practical limit to this combinatorial compensation. In the 
+\textit{Critical} scenario, the scarcity of sufficiently compatible profiles 
+removes the optimizer's evasion routes, inflating the \textit{makespan} from 
+an average of 28 to over 40 days. This degradation reaches its peak in the 
+\textit{Extreme} scenario, where allocations are forced to diametrically opposed 
+profiles and deadlines nearly double, approaching 80 days (Figure 
+\ref{fig:g08_noise}). At this level, the incompatibility raises the task time 
+($T_{ij}$) so much that it exceeds the \textit{sprint's} nominal hours limit. 
+In order for the solver not to declare the project infeasible, the temporary 
+relaxation of the capacity constraint ($Cap_{is}$) becomes essential.
+
+The growth of the Behavioral Error ($EC$) responsible for this impact is 
+detailed in Figure \ref{fig:g09_noise}. The presence of the standard deviation 
+bars validates the methodological design: they exist in the \textit{Baseline} 
+and \textit{Natural} scenarios due to the stochastic generation (Dirichlet 
+distribution), which simulates the organic variability of the teams. In 
+contrast, these bars are null in the \textit{Critical} and \textit{Extreme} 
+scenarios, as deterministic and fixed profiles were employed in these to 
+isolate and quantify the maximum impact of friction without the interference 
+of randomness.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/G07_Behavioral_Line_Makespan.png}
+        \caption{Schedule evolution under noise.}
+        \label{fig:g07_noise}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/G08_Behavioral_Boxplot_Makespan.png}
+        \caption{Variance in behavioral scenarios.}
+        \label{fig:g08_noise}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/G09_Behavioral_Bar_EC.png}
+    \caption{Growth of Behavioral Error (EC) by scenario.}
+    \label{fig:g09_noise}
+\end{figure}
+
+\subsection{Tactical Capacity Planning and Brooks's Law}
+
+From a managerial perspective, the model acts as a direct decision-support 
+tool. The tactical heatmap (Figure \ref{fig:g10_brooks}) allows leaders to 
+quickly evaluate the cost-benefit of resizing the team. In the case of $N=50$ 
+tasks, for example, expanding the team from 3 to 4 developers reduces the 
+\textit{makespan} from 92 to 66 days (a drop of $\approx 28\%$). On the other 
+hand, jumping from 6 to 8 professionals brings a lower marginal return, 
+reducing the deadline from 44 to 32 days ($\approx 27\%$ accumulated in the 
+leap of two developers).
+
+This exhaustion of efficiency, isolated in Figure \ref{fig:g11_brooks} for the 
+demand of $N = 50$ tasks, evidences Brooks's Law quantitatively. The law 
+postulates that adding manpower to a project hits limits of parallelism and 
+increased communication costs. The algorithm replicated this empirical 
+phenomenon: from a certain team size, the time curve becomes an asymptote. 
+This indicates to managers that project dependencies create a ceiling where 
+adding more people stops generating significant gains in delivery speed.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figures/G10_Brooks_Heatmap.png}
+    \caption{Tactical Capacity Planning Matrix.}
+    \label{fig:g10_brooks}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/G11_Brooks_Asymptote.png}
+    \caption{Brooks's Law Asymptote ($N=50$).}
+    \label{fig:g11_brooks}
+\end{figure}
+
+\subsection{Parallelism Limitations due to Precedence Density}
+
+The drop in efficiency observed in larger teams is directly linked to how the 
+tasks in the backlog are interconnected. Graphs \ref{fig:g12_prec} and 
+\ref{fig:g13_prec} show that excessive links and dependencies between 
+activities limit the optimizer's ability to organize allocations in parallel.
+
+When the proportion of precedence relations exceeds the 30\% threshold of 
+possible connections, delivery times begin to rise rapidly. More critical 
+than the isolated delay is the saturation point identified in Graph 
+\ref{fig:g13_prec}. At this level of interdependence, the model reaches a 
+limit where the volume of tasks can no longer be fitted within the available 
+\textit{sprint} budget, making the project mathematically infeasible. This 
+scenario reinforces the current trend of replacing monolithic code structures 
+with microservices. By reducing direct dependencies, the mathematical model 
+is allowed to find windows of parallelism, ensuring delivery within the schedule.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/G12_Precedence_Makespan.png}
+        \caption{Deadline inflation due to precedence.}
+        \label{fig:g12_prec}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/G13_Precedence_Feasibility.png}
+        \caption{Project feasibility by precedence density.}
+        \label{fig:g13_prec}
+    \end{minipage}
+\end{figure}
+
+\subsection{Trade-off between Technical Proficiency and Behavioral Alignment}
+
+The final stage of the analysis explores the trade-off relationship between 
+technical productivity gain ($ET$) and losses generated by behavioral 
+misalignment ($EC$). Figure \ref{fig:g14_surplus} confirms the traditional 
+behavior expected in the literature: when we maintain the team with a stable 
+psychological profile, increasing technical seniority (higher $ET$) results 
+in consistent reductions in the \textit{makespan}.
+
+However, the main contribution of this model lies in the juxtaposition of 
+these two metrics, revealed in Figure \ref{fig:g15_paradoxo}. The mapping of 
+the intersection point of the curves demonstrates an important result: a Junior 
+developer ($ET = 0.0$) suited to the behavioral requirements of the task will 
+be able to execute it in less time than a Senior developer ($ET = 1.0$) 
+operating in the Critical or Extreme error zones. This scenario suggests that 
+high technical qualification alone is not enough to compensate for the delays 
+generated by a strong incompatibility of profiles in the team. Consequently, 
+\textit{squad} formation practices that incorporate psychological mapping cease 
+to be merely a human resources differential and come to mean a real possibility 
+of generating greater operational efficiency.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/G14_Surplus_Makespan.png}
+        \caption{Makespan Reduction via Technical Surplus.}
+        \label{fig:g14_surplus}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/G15_Paradoxo_Especialista.png}
+        \caption{Relation between Technical Surplus and Behavioral Noise.}
+        \label{fig:g15_paradoxo}
+    \end{minipage}
+\end{figure}
+
+\section{Conclusions and Future Work}
+
+This paper presented a mathematical modeling for the Software Project 
+Scheduling Problem (SPSP) that seeks to complement traditional approaches by 
+incorporating not only technical constraints but also behavioral variables. 
+Through a MILP model and the calibration of a cubic penalty function, the 
+results indicate that integrating the psychological compatibility of the team 
+into task allocation contributes to the generation of more accurate and 
+realistic schedules.
+
+The computational experiments generated quantitative results applicable to 
+tactical project management. First, it was demonstrated that planning blind 
+to the human profile presents significant deviations, with the Extreme 
+friction scenario inflating the \textit{makespan} to levels that surpass the 
+structural capacity of the \textit{sprints}. Second, the model mathematically 
+simulated Brooks's Law, identifying the saturation point where increasing the 
+team stops accelerating deliveries. Finally, a relevant socio-technical 
+dynamic was observed: a Junior developer aligned with the task's profile can 
+finish it in less time than a Senior subjected to a high level of cognitive noise.
+
+As guidelines for future research, the expansion of the mathematical model is 
+proposed to cover more complex operational dynamics. Among the mapped 
+improvements, topological flexibilization stands out to allow the splitting 
+of extensive tasks across multiple \textit{sprints} and the refinement of 
+precedence constraints, enabling the start of dependent activities within the 
+same agile cycle. Furthermore, it is planned to introduce individual parallelism 
+(one developer working on multiple simultaneous tasks) and the allocation of 
+small teams for a single activity. In the latter case, the modeling should 
+incorporate variables to quantify communication \textit{overhead}, the 
+adaptation curve\footnote{Refers to the initial time and cognitive effort 
+required for the team to understand the context, code architecture, and specific 
+requirements of a task before reaching their full productivity.}, and intra-team 
+behavioral synergy\footnote{A theoretical metric that evaluates how the 
+combination of different psychological profiles allocated to the same activity 
+affects collaboration, problem-solving dynamics, and the group's joint efficiency.}, 
+ensuring that the addition of new members complements the work cell and does 
+not intensify cognitive friction.
+
+\section*{Acknowledgements}
+
+We acknowledge the support of the Fundação de Amparo à Pesquisa de Minas Gerais 
+(FAPEMIG) and the Pró-Reitoria de Pesquisa da Universidade Federal de Minas 
+Gerais (PRPq/UFMG) through the funding obtained by the Edict PRPq 
+PROBIC/FAPEMIG - 11/2025.
+
+\bibliographystyle{sbpo}
+\bibliography{references}
+
+\end{document}

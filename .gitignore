@@ -15,7 +15,8 @@ data/instances/
 data/results/
 
 # Graficos gerados dinamicamente pelo plot_gen.py
-docs/paper/figures/*.png
+docs/paper-pt/figures/*.png
+docs/paper-en/figures/*.png
 
 # Arquivos temporarios do compilador LaTeX
 *.aux

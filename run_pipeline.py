@@ -74,8 +74,6 @@ def main():
 
     print("\n" + "=" * 60)
     print("[SUCESSO] Pipeline finalizado!")
-    print(f"-> O arquivo CSV esta em: {os.path.join('data', 'results')}")
-    print(f"-> Os graficos estao em: {os.path.join('docs', 'paper', 'figures')}")
     print("=" * 60 + "\n")
 
 if __name__ == "__main__":
