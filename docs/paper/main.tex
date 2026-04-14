@@ -225,20 +225,20 @@ o ganho de produtividade para ser mais condizente com a realidade prática:
 Para quantificar o desgaste cognitivo provocado pelo desalinhamento psicológico, 
 calcula-se inicialmente a diferença absoluta entre os quadrantes do perfil comportamental
 requerido pela tarefa e o perfil do desenvolvedor, denotada 
-por $x_{ij}$. A divisão por $2$ atua como um fator de normalização: como os perfis 
+por $\psi_{ij}$. A divisão por $2$ atua como um fator de normalização: como os perfis 
 comportamentais são representados por distribuições proporcionais (cuja soma 
 vetorial é sempre $1.0$), a maior diferença absoluta possível entre dois perfis 
 diametralmente opostos resulta em $2.0$. Essa divisão garante que a métrica 
-$x_{ij}$ convirja estritamente para o intervalo contínuo de $[0, 1]$. Em 
+$\psi_{ij}$ convirja estritamente para o intervalo contínuo de $[0, 1]$. Em 
 seguida, aplica-se uma função polinomial de ordem $n$ com um multiplicador de 
 ganho $k$ para penalizar desalinhamentos mais severos. Estes parâmetros foram 
 definidos empiricamente como $n=3$ e $k=5.0$, formulação cuja justificativa é
 detalhada na Seção 4.1:
 \begin{equation}
-    x_{ij} = \frac{1}{2} \sum_{p \in P} |Pd_{ip} - Pt_{jp}| \quad \forall i \in M, \forall j \in N
+    \psi_{ij} = \frac{1}{2} \sum_{p \in P} |Pd_{ip} - Pt_{jp}| \quad \forall i \in M, \forall j \in N
 \end{equation}
 \begin{equation}
-    EC_{ij} = 5.0 \cdot (x_{ij})^3 \quad \forall i \in M, \forall j \in N
+    EC_{ij} = 5.0 \cdot (\psi_{ij})^3 \quad \forall i \in M, \forall j \in N
 \end{equation}
 
 \vspace{0.2cm}
@@ -313,18 +313,21 @@ garantindo que o \textit{makespan} englobe o tempo de finalização da última
 
 \section{Metodologia Experimental}
 
-Para garantir a confiabilidade estatística e o isolamento preciso das variáveis, 
-um gerador paramétrico em Python instanciou as matrizes dos parâmetros de entrada de
-forma  pseudoaleatória. O conjunto de dados computacional compreende 1380 instâncias
-de teste, estruturadas de modo a assegurar 30 amostras independentes por cada cenário 
-analisado. O tempo nominal base ($T^{base}_j$) foi dimensionado para representar 
-projetos práticos de desenvolvimento de software, induzindo prazos totais na faixa
-de 30 a 100 dias corridos. As instâncias foram categorizadas em cinco grupos de validação:
+Para garantir confiabilidade estatística, um gerador em Python instanciou as matrizes de entrada 
+de forma pseudoaleatória. O conjunto compreende 1380 instâncias, assegurando 30 amostras por 
+cenário, com tempos nominais ($T^{base}_j$) projetados para prazos de 30 a 100 dias corridos. 
+
+Em todos os experimentos, o tamanho da equipe ($M$) foi restrito ao intervalo de 3 a 8 membros. 
+Essa faixa reflete o padrão real para \textit{squads} ágeis, visto que a literatura demonstra 
+que equipes com mais de 9 integrantes sofrem quedas drásticas de produtividade devido ao excesso 
+de comunicação e coordenação \cite{kniberg2012, schwaber2017}. As instâncias foram categorizadas 
+em cinco grupos:
 
 \begin{itemize}
     \item \textbf{Escalabilidade do MILP:} Examina o esforço computacional e o 
     crescimento combinatório do modelo de otimização através do dimensionamento 
-    progressivo do \textit{backlog} de tarefas ($N \in [10, 80]$).
+    progressivo do \textit{backlog} de tarefas ($N \in [10, 80]$), mantendo o 
+    tamanho da equipe fixo no valor mediano de $M = 5$ desenvolvedores.
     \item \textbf{Ruído Comportamental:} Mensura o impacto no prazo sob quatro 
     matrizes de alocação: \textit{Baseline} (sem penalidade), \textit{Natural} 
     (perfis estocásticos), \textit{Crítico} (atrito moderado) e \textit{Extremo} 
@@ -332,9 +335,9 @@ de 30 a 100 dias corridos. As instâncias foram categorizadas em cinco grupos de
     \item \textbf{Lei de Brooks:} Avalia o planejamento tático de capacidade 
     iterando simultaneamente as variáveis de volume de tarefas ($N \in [25, 60]$) 
     e o tamanho da equipe de desenvolvedores alocada no projeto ($M \in [3, 8]$).
-    \item \textbf{Densidade de Precedência:} Quantifica os gargalos estruturais 
-    e a queda na viabilidade do projeto saturando o acoplamento do grafo de 
-    interdependências em até 40\% da sua capacidade relacional máxima.
+    \item \textbf{Densidade de Precedência:} Quantifica como a proporção de interdependência 
+    entre tarefas impacta o \textit{makespan} total, identificando o ponto de saturação em 
+    que o projeto se torna inviável dentro do orçamento de \textit{sprints}.
     \item \textbf{Excedente Técnico:} Avalia os ganhos de produtividade de equipes 
     altamente qualificadas e os contrapõe às perdas geradas pelo ruído comportamental,
     cruzando o aumento da senioridade com o desalinhamento dos perfis para 
@@ -447,39 +450,36 @@ nas piores formulações do conjunto, evidenciando o aumento da profundidade da
 
 \subsection{Evolução sob o Efeito de Ruído Comportamental}
 
-A análise empírica dos quatro cenários de ruído comportamental traz um 
-resultado interessante sobre a dinâmica das equipes e a resposta do modelo 
-matemático. Conforme ilustrado na Figura \ref{fig:g07_noise}, a transição 
-do cenário \textit{Baseline} (uma equipe ideal e sem atritos) para o cenário 
-\textit{Natural} (perfis estocásticos realistas) resultou em prazos de entrega 
-equivalentes. Esse empate sugere um reflexo direto de como a formulação
-matemática interage com as decisões do otimizador.
+O cenário \textit{Baseline} atua como um limite inferior matemático de tempo 
+para o cronograma. Ele representa uma ``equipe ideal'', caracterizada por 
+uma abstração onde os perfis dos desenvolvedores são perfeitamente idênticos 
+aos requisitos das tarefas ($Pd_{ip} = Pt_{jp}$), anulando o erro comportamental. 
+Conforme a Figura \ref{fig:g07_noise}, a transição desse cenário para o 
+\textit{Natural} (perfis estocásticos) resultou em prazos de entrega equivalentes. 
+Isso ocorre porque a função de penalidade cúbica absorve desvios sutis dentro 
+da Zona de Aceitação ($\psi_{ij} \le 0.3$). Consequentemente, o algoritmo MILP 
+consegue distribuir as tarefas de maneira tão aderente que anula o ruído 
+inerente a uma equipe real, igualando à eficiência de um cenário ideal.
 
-O modelo proposto utiliza uma função de penalidade cúbica, isso significa que,
-para desvios comportamentais sutis (dentro da Zona de Aceitação, $x_{ij} \le 0.3$), 
-o impacto gerado no tempo de execução é matematicamente absorvido. Somado a 
-isso, o algoritmo MILP atua de forma a distribuir as tarefas de maneira a 
-maximizar a afinidade sociotécnica de cada alocação. Na prática, o otimizador 
-consegue contornar os atritos cotidianos, permitindo que uma equipe real 
-produza com a mesma eficiência de um cenário idealizado.
+Contudo, existe um limite prático para essa compensação combinatória. 
+No cenário \textit{Crítico}, a escassez de perfis suficientemente compatíveis 
+retira as rotas de evasão do otimizador, inflacionando o \textit{makespan} de 
+uma média de 28 para mais de 40 dias. Essa degradação atinge seu ápice no 
+cenário \textit{Extremo}, onde as alocações são forçadas a perfis diametralmente 
+opostos e os prazos quase dobram, beirando os 80 dias (Figura \ref{fig:g08_noise}). 
+Nesse nível, a incompatibilidade eleva tanto o tempo da tarefa ($T_{ij}$) que 
+estoura o limite de horas nominais da \textit{sprint}. Para que o solver não 
+declare o projeto inviável, torna-se essencial a flexibilização temporária da 
+restrição de capacidade ($Cap_{is}$).
 
-Contudo, existe um limite matemático e prático para essa compensação. Quando 
-o projeto exige alocações mais complexas e o grupo não possui perfis 
-suficientemente compatíveis, o otimizador perde suas rotas de fuga. No cenário 
-\textit{Crítico}, o modelo não consegue mais evitar as penalidades, o que 
-provoca um aumento considerável no \textit{makespan}, passando de uma média 
-de 28 para mais de 40 dias de duração.
-
-Esse efeito de degradação fica ainda mais evidente no cenário \textit{Extremo}, 
-onde as tarefas são obrigatoriamente alocadas a perfis diametralmente opostos. 
-Como mostra a Figura \ref{fig:g08_noise}, os prazos quase dobram, beirando os 
-80 dias. Nesse ponto, a incompatibilidade foi tão alta que o tempo de 
-execução ajustado ($T_{ij}$) chegou a estourar o limite de horas nominais de 
-uma \textit{sprint}. Para que o solver conseguisse encontrar uma solução válida 
-e não declarasse o projeto inviável, foi necessário flexibilizar temporariamente 
-a restrição de capacidade ($Cap_{is}$). O crescimento do Erro Comportamental 
-($EC$) que causou esse impacto na equipe pode ser observado na 
-Figura \ref{fig:g09_noise}.
+O crescimento do Erro Comportamental ($EC$) responsável por esse impacto 
+é detalhado na Figura \ref{fig:g09_noise}. A presença das barras de desvio 
+padrão valida o desenho metodológico: elas existem nos cenários \textit{Baseline} 
+e \textit{Natural} em decorrência da geração estocástica (distribuição de Dirichlet), 
+que simula a variabilidade orgânica das equipes. Em contrapartida, essas barras 
+são nulas nos cenários \textit{Crítico} e \textit{Extremo}, pois nestes foram 
+empregados perfis determinísticos e fixos, com o intuito de isolar e quantificar 
+o impacto máximo do atrito sem a interferência da aleatoriedade.
 
 \begin{figure}[H]
     \centering
@@ -509,9 +509,11 @@ Figura \ref{fig:g09_noise}.
 Do ponto de vista gerencial, o modelo atua como uma ferramenta direta de 
 suporte à decisão. O mapa de calor tático (Figura \ref{fig:g10_brooks}) 
 permite aos líderes avaliarem rapidamente o custo-benefício de redimensionar 
-a equipe. Fica evidente, por exemplo, que expandir o quadro de 3 para 4 
-desenvolvedores reduz o \textit{makespan} de forma expressiva. Em contrapartida, 
-saltar de 6 para 8 profissionais traz um ganho baixo no prazo final.
+a equipe. No caso de $N=50$ tarefas, por exemplo, expandir a equipe 
+de 3 para 4 desenvolvedores reduz o \textit{makespan} de 92 para 66 dias 
+(queda de $\approx 28\%$) . Por outro lado, saltar de 6 para 8 
+profissionais traz um retorno marginal menor, reduzindo o prazo de 44 para 32 
+dias ($\approx 27\%$ acumulados no salto de dois desenvolvedores).
 
 Esse esgotamento da eficiência, isolado na Figura \ref{fig:g11_brooks} para 
 a demanda de $N = 50$ tarefas, evidencia a Lei de Brooks de forma quantitativa. 
@@ -519,7 +521,7 @@ A lei postula que adicionar força de trabalho a um projeto esbarra em limites
 de paralelismo e no aumento do custo de comunicação. O algoritmo replicou esse 
 fenômeno empírico: a partir de um determinado tamanho de equipe, a curva de 
 tempo torna-se uma assíntota. Isso indica aos gestores que as dependências do 
-projeto criam um teto onde adicionar mais pessoas deixa de gerar ganhos reais 
+projeto criam um teto onde adicionar mais pessoas deixa de gerar ganhos significativos 
 na velocidade de entrega.
 
 \begin{figure}[H]
@@ -538,21 +540,22 @@ na velocidade de entrega.
 
 \subsection{Limitações de Paralelismo por Densidade de Precedência}
 
-A redução nas taxas de eficiência observadas nos times ampliados é uma manifestação 
-direta da tipologia relacional interligando o \textit{backlog} operacional. As restrições 
-ilustradas nos Gráficos \ref{fig:g12_prec} e \ref{fig:g13_prec} validam a pressuposição de que o acoplamento 
-fechado de um repositório restringe a movimentação otimizada das alocações no solver.
+A queda de eficiência observada em equipes maiores está ligada diretamente à 
+forma como as tarefas do backlog estão interconectadas. Os Gráficos 
+\ref{fig:g12_prec} e \ref{fig:g13_prec} mostram que o excesso de vínculos e 
+dependências entre as atividades limita a capacidade do otimizador de 
+organizar as alocações de forma paralela.
 
-À medida que o fator de amarrações e dependências topológicas excede o limiar 
-dos 30\% da capacidade do grafo conectivo, as métricas de tempo inflacionam abruptamente.
-Mais relevante que a expansão temporal é a taxa de inviabilidade detectada no Gráfico \ref{fig:g13_prec};
-sob tais níveis de acoplamento rígido, os solvers se mostram incapacitados de encaixar o 
-volume das tarefas sem ultrapassar os limites de capacidade em \textit{sprints} totais, 
-reprovando matematicamente o projeto. Estes fatores sugerem a propensão atual 
-das entidades industriais em abandonar matrizes monolíticas de estruturação em 
-favor de microsserviços. Essa abordagem descentralizada quebra a densidade do grafo 
-de dependências, devolvendo ao modelo matemático a flexibilidade combinatória 
-necessária para processar os recursos paralelamente sem invalidar o cronograma.
+Quando a proporção de relações de precedência ultrapassa o limite de 30\% das 
+conexões possíveis, os prazos de entrega começam a subir rapidamente. Mais 
+crítico que o atraso isolado é o ponto de saturação identificado no Gráfico 
+\ref{fig:g13_prec}. Nesse nível de interdependência, o modelo atinge um limite 
+onde o volume de tarefas não consegue mais ser encaixado dentro do orçamento 
+de sprints disponível, tornando o projeto matematicamente inviável. Esse 
+cenário reforça a tendência atual de substituir estruturas de código 
+monolíticas por microsserviços. Ao reduzir as dependências diretas, permite-se 
+que o modelo matemático encontre janelas de paralelismo, garantindo a entrega 
+dentro do cronograma.
 
 \begin{figure}[H]
     \centering
@@ -646,6 +649,12 @@ combinação de diferentes perfis psicológicos alocados na mesma atividade afet
 colaboração, a dinâmica de resolução de problemas e a eficiência conjunta do grupo.},
 assegurando que a adição de novos membros complemente a célula de trabalho e não
 intensifique o atrito cognitivo.
+
+\section*{Agradecimentos}
+
+Agradecemos o apoio da Fundação de Amparo à Pesquisa de Minas Gerais (FAPEMIG) e da
+Pró-Reitoria de Pesquisa da Universidade Federal de Minas Gerais (PRPq/UFMG) através
+do financiamento obtido pelo Edital PRPq PROBIC/FAPEMIG - 11/2025.
 
 \bibliographystyle{sbpo}
 \bibliography{references}

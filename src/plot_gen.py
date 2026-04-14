@@ -26,8 +26,8 @@ OUTPUT_DIR = os.path.join("docs", "paper", "figures")
 # Garante a existência do diretório de imagens do artigo
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Configuração global de estética dos gráficos
-sns.set_theme(style="whitegrid", palette="muted")
+# Configuração global de estética dos gráficos com font_scale ampliado (1.5) para leitura perfeita em duas colunas
+sns.set_theme(style="whitegrid", palette="muted", font_scale=1.5)
 
 print(f"\nIniciando pipeline de geração de gráficos (Destino: '{OUTPUT_DIR}')...")
 
@@ -49,9 +49,9 @@ plt.plot(x, 1.0 + (k_fixed * (x**2)), label='Erro Quadrático (Ordem 2)', color=
 plt.plot(x, 1.0 + (k_fixed * (x**3)), label='Erro Cúbico Proposto (Ordem 3)', color='indigo', linewidth=3.5)
 plt.plot(x, 1.0 + (k_fixed * (x**4)), label='Erro Quártico (Ordem 4)', color='teal', linestyle='-.', linewidth=2.5)
 plt.axhline(1.0, color='black', linewidth=1, linestyle='dashed')
-plt.title("Modelagem do Impacto Comportamental por Zonas de Risco", fontweight='bold', fontsize=14)
-plt.xlabel("Desalinhamento Comportamental (0.0 a 1.0)", fontsize=12)
-plt.ylabel("Multiplicador do Tempo de Execução", fontsize=12)
+plt.title("Modelagem do Impacto Comportamental por Zonas de Risco", fontweight='bold', fontsize=20)
+plt.xlabel("Desalinhamento Comportamental (0.0 a 1.0)", fontsize=18)
+plt.ylabel("Multiplicador do Tempo de Execução", fontsize=18)
 plt.xlim(0, 1)
 plt.ylim(0.8, 6.2)
 plt.legend(loc="upper left", frameon=True, facecolor='white', framealpha=0.9)
@@ -72,15 +72,15 @@ plt.plot(x, 1.0 + (10.0 * (x**3)), label='k=10 (Superestimado)', color='darkred'
 
 plt.axhline(1.0, color='black', linewidth=1, linestyle='dashed')
 plt.axhline(1.5, color='darkgreen', linewidth=1, linestyle='dashed')
-plt.text(0.02, 1.6, "Limite Aceitável (1.5x)", color='darkgreen', fontsize=9, fontweight='bold')
+plt.text(0.02, 1.6, "Limite Aceitável (1.5x)", color='darkgreen', fontsize=14, fontweight='bold')
 plt.axhline(3.0, color='darkorange', linewidth=1, linestyle='dashed')
-plt.text(0.02, 3.1, "Limite Crítico (3x)", color='darkorange', fontsize=9, fontweight='bold')
+plt.text(0.02, 3.1, "Limite Crítico (3x)", color='darkorange', fontsize=14, fontweight='bold')
 plt.axhline(6.0, color='darkred', linewidth=1, linestyle='dashed')
-plt.text(0.02, 6.1, "Limite Inviável (6x)", color='darkred', fontsize=9, fontweight='bold')
+plt.text(0.02, 6.1, "Limite Inviável (6x)", color='darkred', fontsize=14, fontweight='bold')
 
-plt.title("Calibração Empírica do Fator de Penalidade (k) na Função Cúbica", fontweight='bold', fontsize=14)
-plt.xlabel("Desalinhamento Comportamental (0.0 a 1.0)", fontsize=12)
-plt.ylabel("Multiplicador do Tempo de Execução", fontsize=12)
+plt.title("Calibração Empírica do Fator de Penalidade (k)", fontweight='bold', fontsize=20)
+plt.xlabel("Desalinhamento Comportamental (0.0 a 1.0)", fontsize=18)
+plt.ylabel("Multiplicador do Tempo de Execução", fontsize=18)
 plt.xlim(0, 1)
 plt.ylim(0.8, 11.5)
 plt.legend(loc="upper left", frameon=True, facecolor='white', framealpha=0.9)
@@ -102,16 +102,16 @@ plt.plot(x, y_pleno, label='Pleno (ET = 0.5)', color='steelblue', linestyle='-.'
 plt.plot(x, y_senior, label='Sênior (ET = 1.0)', color='indigo', linewidth=3.5)
 
 plt.axhline(1.0, color='black', linewidth=1, linestyle='dashed')
-plt.text(0.02, 1.05, "Tempo Nominal (100%)", color='black', fontsize=10, fontweight='bold')
+plt.text(0.02, 1.05, "Tempo Nominal (100%)", color='black', fontsize=16, fontweight='bold')
 
 cross_idx = np.where(y_senior >= 1.0)[0][0]
 cross_x = x[cross_idx]
 plt.plot(cross_x, 1.0, marker='o', markersize=8, color="red")
-plt.text(cross_x + 0.02, 0.85, f"Vantagem Técnica\nAnulada (x={cross_x:.2f})", color='red', fontweight='bold')
+plt.text(cross_x + 0.02, 0.82, f"Vantagem Técnica\nAnulada (x={cross_x:.2f})", color='red', fontweight='bold', fontsize=15)
 
-plt.title("O Paradoxo do Especialista: Excedente Técnico vs. Ruído Comportamental", fontweight='bold', fontsize=14)
-plt.xlabel("Desalinhamento Comportamental (0.0 a 1.0)", fontsize=12)
-plt.ylabel("Multiplicador do Tempo de Execução Final", fontsize=12)
+plt.title("O Paradoxo do Especialista", fontweight='bold', fontsize=20)
+plt.xlabel("Desalinhamento Comportamental (0.0 a 1.0)", fontsize=18)
+plt.ylabel("Multiplicador do Tempo Final", fontsize=18)
 plt.xlim(0, 1)
 plt.ylim(0.4, 6.2)
 plt.legend(loc="upper left", frameon=True, facecolor='white', framealpha=0.9)
@@ -172,7 +172,7 @@ else:
     if not df_exp2.empty:
         plt.figure(figsize=(8, 5), dpi=300)
         sns.lineplot(data=df_exp2, x="Cenario", y="mksp", marker="o", color="darkorange", linewidth=2.5)
-        plt.title("Evolução do Cronograma sob Desalinhamento Comportamental", fontweight="bold")
+        plt.title("Evolução do Cronograma sob Ruído", fontweight="bold")
         plt.xlabel("Cenário Comportamental")
         plt.ylabel("Makespan Médio (Dias)")
         plt.tight_layout()
@@ -188,7 +188,7 @@ else:
 
         plt.figure(figsize=(8, 5), dpi=300)
         sns.barplot(data=df_exp2, x="Cenario", y="avg_EC", palette="autumn", ci="sd")
-        plt.title("Crescimento do Erro Comportamental (EC) Calculado", fontweight="bold")
+        plt.title("Crescimento do Erro Comportamental (EC)", fontweight="bold")
         plt.xlabel("Cenário Comportamental")
         plt.ylabel("Erro Comportamental (EC) Médio")
         plt.tight_layout()
@@ -201,7 +201,7 @@ else:
         plt.figure(figsize=(10, 6), dpi=300)
         sns.heatmap(pivot_df, annot=True, fmt="g", cmap="YlOrRd", linewidths=.5, 
                     cbar_kws={'label': 'Makespan (Dias)', 'orientation': 'horizontal', 'location': 'bottom'})
-        plt.title("Matriz de Planejamento Tático de Capacidade (Escala Larga)", fontweight="bold")
+        plt.title("Matriz de Planejamento Tático de Capacidade", fontweight="bold")
         plt.xlabel("Número de Tarefas (N)")
         plt.ylabel("Desenvolvedores Disponíveis (M)")
         plt.savefig(os.path.join(OUTPUT_DIR, "G10_Brooks_Heatmap.png"), bbox_inches='tight')
