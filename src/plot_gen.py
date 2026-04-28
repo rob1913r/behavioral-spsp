@@ -1,341 +1,308 @@
-# -*- coding: utf-8 -*-
-"""
-Módulo de Geração de Gráficos e Visualizações Analíticas.
-
-Este script é responsável por renderizar os gráficos utilizados no artigo (G01 a G15).
-Ele gera duas baterias de imagens automaticamente:
-1. Versão em Português (salva em docs/paper-pt/figures/)
-2. Versão em Inglês (salva em docs/paper-en/figures/)
-"""
-
+import os
+import glob
 import pandas as pd
-import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-import os
-import warnings
+import numpy as np
 
-# Suprime avisos do Pandas/Matplotlib para uma execução limpa no console
-warnings.filterwarnings('ignore')
+plt.rcParams.update({'font.size': 30})
 
-# Caminho de entrada do CSV
-INPUT_CSV = os.path.join("data", "results", "metrics.csv")
-
-# Configuração global de estética dos gráficos com font_scale ampliado (1.5)
-sns.set_theme(style="whitegrid", palette="muted", font_scale=1.5)
-
-# ==============================================================================
-# DICIONÁRIO DE INTERNACIONALIZAÇÃO (i18n)
-# ==============================================================================
-LANG_STR = {
-    'pt': {
-        'out_dir': os.path.join("docs", "paper-pt", "figures"),
-        # G01
-        'g01_title': "Modelagem do Impacto Comportamental por Zonas de Risco",
-        'g01_x': "Desalinhamento Comportamental (0.0 a 1.0)",
-        'g01_y': "Multiplicador do Tempo de Execução",
-        'z_acc': "Zona de Aceitação", 'z_crit': "Zona Crítica", 'z_ext': "Zona Extrema / Irreal",
-        'l_lin': "Erro Linear (Ordem 1)", 'l_quad': "Erro Quadrático (Ordem 2)",
-        'l_cub': "Erro Cúbico Proposto (Ordem 3)", 'l_quar': "Erro Quártico (Ordem 4)",
-        # G02
-        'g02_title': "Calibração Empírica do Fator de Penalidade (k)",
-        'k2': "k=2 (Subestimado)", 'k5': "k=5 (Proposto)", 'k10': "k=10 (Superestimado)",
-        't_acc': "Limite Aceitável (1.5x)", 't_crit': "Limite Crítico (3x)", 't_inv': "Limite Inviável (6x)",
-        # G15
-        'g15_title': "O Paradoxo do Especialista",
-        'g15_y': "Multiplicador do Tempo Final",
-        'l_jun': "Júnior (ET = 0.0)", 'l_mid': "Pleno (ET = 0.5)", 'l_sen': "Sênior (ET = 1.0)",
-        't_nom': "Tempo Nominal (100%)", 't_null': "Vantagem Técnica\nAnulada",
-        # G03 & G04
-        'g03_title': "Esforço Computacional por Número de Tarefas",
-        'g04_title': "Crescimento do Tempo vs. Tarefas (N)",
-        'x_task': "Número de Tarefas (N)", 'y_time_s': "Tempo de Otimização (s)", 'y_time_avg': "Tempo Médio (s)",
-        # G05 & G06
-        'g05_title': "Distribuição do Tempo por Quantidade de Variáveis",
-        'g06_title': "Crescimento do Tempo vs. Variáveis de Decisão",
-        'x_var_b': "Faixas de Variáveis de Decisão", 'x_var_n': "Número de Variáveis Internas no Solver",
-        # G07, G08, G09
-        'g07_title': "Evolução do Cronograma sob Ruído",
-        'g08_title': "Variância do Makespan nos Cenários Críticos",
-        'g09_title': "Crescimento do Erro Comportamental (EC)",
-        'x_scen': "Cenário Comportamental", 'y_mksp': "Makespan (Dias)", 
-        'y_mksp_avg': "Makespan Médio (Dias)", 'y_ec': "Erro Comportamental (EC) Médio",
-        # G10 & G11
-        'g10_title': "Matriz de Planejamento Tático de Capacidade",
-        'g11_title': "A Assíntota da Lei de Brooks (N=50)",
-        'y_devs': "Desenvolvedores Disponíveis (M)", 'x_devs': "Número de Desenvolvedores (M)",
-        # G12 & G13
-        'g12_title': "Inflação do prazo devido a dependências estritas",
-        'g13_title': "Queda drástica na Viabilidade do Projeto",
-        'x_dens': "Densidade de Precedência", 'y_feas': "Soluções Viáveis (%)",
-        # G14
-        'g14_title': "Redução de Makespan via Excedente Técnico",
-        'x_tech': "Nível de Proficiência Técnica"
-    },
-    'en': {
-        'out_dir': os.path.join("docs", "paper-en", "figures"),
-        # G01
-        'g01_title': "Modeling Behavioral Impact by Risk Zones",
-        'g01_x': "Behavioral Misalignment (0.0 to 1.0)",
-        'g01_y': "Execution Time Multiplier",
-        'z_acc': "Acceptance Zone", 'z_crit': "Critical Zone", 'z_ext': "Extreme / Unreal Zone",
-        'l_lin': "Linear Error (Order 1)", 'l_quad': "Quadratic Error (Order 2)",
-        'l_cub': "Proposed Cubic Error (Order 3)", 'l_quar': "Quartic Error (Order 4)",
-        # G02
-        'g02_title': "Empirical Calibration of the Penalty Factor (k)",
-        'k2': "k=2 (Underestimated)", 'k5': "k=5 (Proposed)", 'k10': "k=10 (Overestimated)",
-        't_acc': "Acceptable Limit (1.5x)", 't_crit': "Critical Limit (3x)", 't_inv': "Infeasible Limit (6x)",
-        # G15
-        'g15_title': "The Specialist Paradox",
-        'g15_y': "Final Time Multiplier",
-        'l_jun': "Junior (TS = 0.0)", 'l_mid': "Mid-level (TS = 0.5)", 'l_sen': "Senior (TS = 1.0)",
-        't_nom': "Nominal Time (100%)", 't_null': "Technical Advantage\nNullified",
-        # G03 & G04
-        'g03_title': "Computational Effort by Number of Tasks",
-        'g04_title': "Time Growth vs. Tasks (N)",
-        'x_task': "Number of Tasks (N)", 'y_time_s': "Optimization Time (s)", 'y_time_avg': "Average Time (s)",
-        # G05 & G06
-        'g05_title': "Time Distribution by Quantity of Variables",
-        'g06_title': "Time Growth vs. Decision Variables",
-        'x_var_b': "Decision Variable Ranges", 'x_var_n': "Number of Internal Variables in Solver",
-        # G07, G08, G09
-        'g07_title': "Schedule Evolution under Noise",
-        'g08_title': "Makespan Variance in Critical Scenarios",
-        'g09_title': "Growth of Behavioral Error (BE)",
-        'x_scen': "Behavioral Scenario", 'y_mksp': "Makespan (Days)", 
-        'y_mksp_avg': "Average Makespan (Days)", 'y_ec': "Average Behavioral Error (BE)",
-        # G10 & G11
-        'g10_title': "Tactical Capacity Planning Matrix",
-        'g11_title': "Brooks's Law Asymptote (N=50)",
-        'y_devs': "Available Developers (M)", 'x_devs': "Number of Developers (M)",
-        # G12 & G13
-        'g12_title': "Schedule Inflation due to Strict Dependencies",
-        'g13_title': "Drastic Drop in Project Feasibility",
-        'x_dens': "Precedence Density", 'y_feas': "Feasible Solutions (%)",
-        # G14
-        'g14_title': "Makespan Reduction via Technical Surplus",
-        'x_tech': "Technical Proficiency Level"
-    }
-}
-
-print(f"\nIniciando pipeline de geração de gráficos...")
-
-# Carrega o CSV apenas uma vez, se existir
-df = None
-if os.path.exists(INPUT_CSV):
-    df = pd.read_csv(INPUT_CSV)
-else:
-    print(f"[AVISO] Arquivo '{INPUT_CSV}' não encontrado. Apenas gráficos teóricos serão gerados.")
-
-# ==============================================================================
-# LOOP PRINCIPAL PARA GERAR OS DOIS IDIOMAS
-# ==============================================================================
-for lang in ['pt', 'en']:
-    S = LANG_STR[lang]
-    OUTPUT_DIR = S['out_dir']
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+def gerar_brainstorming_completo():
+    pastas_resultados = sorted(glob.glob("data/results/Cenario_*"))
+    if not pastas_resultados:
+        print("❌ Nenhum resultado Super CSV encontrado. Rode o optimizer.py novo.")
+        return
+        
+    pasta_plots = "data/results/plots_brainstorming"
+    os.makedirs(pasta_plots, exist_ok=True)
+    sns.set_theme(style="whitegrid", palette="muted")
     
-    print(f"---> Renderizando gráficos em [{lang.upper()}] (Destino: '{OUTPUT_DIR}')")
+    # DataFrame Mestre para análises comparativas globais
+    df_global = pd.DataFrame()
     
-    x = np.linspace(0, 1, 500)
-    k_fixed = 5.0
+    print(f"🚀 Iniciando Geração de ~30 Gráficos em {pasta_plots}...")
 
-    # --- G01 ---
-    plt.figure(figsize=(10, 6), dpi=300)
-    plt.axvspan(0.0, 0.3, color='limegreen', alpha=0.15, label=S['z_acc'])
-    plt.axvspan(0.3, 0.7, color='orange', alpha=0.15, label=S['z_crit'])
-    plt.axvspan(0.7, 1.0, color='crimson', alpha=0.15, label=S['z_ext'])
-    plt.plot(x, 1.0 + (k_fixed * x), label=S['l_lin'], color='gray', linestyle=':', linewidth=2)
-    plt.plot(x, 1.0 + (k_fixed * (x**2)), label=S['l_quad'], color='steelblue', linestyle='--', linewidth=2)
-    plt.plot(x, 1.0 + (k_fixed * (x**3)), label=S['l_cub'], color='indigo', linewidth=3.5)
-    plt.plot(x, 1.0 + (k_fixed * (x**4)), label=S['l_quar'], color='teal', linestyle='-.', linewidth=2.5)
-    plt.axhline(1.0, color='black', linewidth=1, linestyle='dashed')
-    plt.title(S['g01_title'], fontweight='bold', fontsize=20)
-    plt.xlabel(S['g01_x'], fontsize=18)
-    plt.ylabel(S['g01_y'], fontsize=18)
-    plt.xlim(0, 1)
-    plt.ylim(0.8, 6.2)
-    plt.legend(loc="upper left", frameon=True, facecolor='white', framealpha=0.9)
-    plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "G01_Justificativa_Matematica.png"))
-
-    # --- G02 ---
-    plt.figure(figsize=(10, 6), dpi=300)
-    plt.axvspan(0.0, 0.3, color='limegreen', alpha=0.15, label=S['z_acc'])
-    plt.axvspan(0.3, 0.7, color='orange', alpha=0.15, label=S['z_crit'])
-    plt.axvspan(0.7, 1.0, color='crimson', alpha=0.15, label=S['z_ext'])
-    plt.plot(x, 1.0 + (2.0 * (x**3)), label=S['k2'], color='lightgray', linestyle='-.', linewidth=2)
-    plt.plot(x, 1.0 + (4.0 * (x**3)), label='k=4', color='darkgray', linestyle='--', linewidth=2)
-    plt.plot(x, 1.0 + (5.0 * (x**3)), label=S['k5'], color='indigo', linewidth=3.5)
-    plt.plot(x, 1.0 + (6.0 * (x**3)), label='k=6', color='indianred', linestyle='--', linewidth=2)
-    plt.plot(x, 1.0 + (10.0 * (x**3)), label=S['k10'], color='darkred', linestyle=':', linewidth=2.5)
-    plt.axhline(1.0, color='black', linewidth=1, linestyle='dashed')
-    plt.axhline(1.5, color='darkgreen', linewidth=1, linestyle='dashed')
-    plt.text(0.02, 1.6, S['t_acc'], color='darkgreen', fontsize=14, fontweight='bold')
-    plt.axhline(3.0, color='darkorange', linewidth=1, linestyle='dashed')
-    plt.text(0.02, 3.1, S['t_crit'], color='darkorange', fontsize=14, fontweight='bold')
-    plt.axhline(6.0, color='darkred', linewidth=1, linestyle='dashed')
-    plt.text(0.02, 6.1, S['t_inv'], color='darkred', fontsize=14, fontweight='bold')
-    plt.title(S['g02_title'], fontweight='bold', fontsize=20)
-    plt.xlabel(S['g01_x'], fontsize=18)
-    plt.ylabel(S['g01_y'], fontsize=18)
-    plt.xlim(0, 1)
-    plt.ylim(0.8, 11.5)
-    plt.legend(loc="upper left", frameon=True, facecolor='white', framealpha=0.9)
-    plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "G02_Calibracao_K.png"))
-
-    # --- G15 ---
-    plt.figure(figsize=(10, 6), dpi=300)
-    plt.axvspan(0.0, 0.3, color='limegreen', alpha=0.15)
-    plt.axvspan(0.3, 0.7, color='orange', alpha=0.15)
-    plt.axvspan(0.7, 1.0, color='crimson', alpha=0.15)
-    y_junior = 1.0 + (5.0 * (x**3)) - (0.5 * 0.0) 
-    y_pleno = 1.0 + (5.0 * (x**3)) - (0.5 * 0.5)  
-    y_senior = 1.0 + (5.0 * (x**3)) - (0.5 * 1.0) 
-    plt.plot(x, y_junior, label=S['l_jun'], color='darkorange', linestyle='--', linewidth=2.5)
-    plt.plot(x, y_pleno, label=S['l_mid'], color='steelblue', linestyle='-.', linewidth=2.5)
-    plt.plot(x, y_senior, label=S['l_sen'], color='indigo', linewidth=3.5)
-    plt.axhline(1.0, color='black', linewidth=1, linestyle='dashed')
-    plt.text(0.02, 1.05, S['t_nom'], color='black', fontsize=16, fontweight='bold')
-    cross_idx = np.where(y_senior >= 1.0)[0][0]
-    cross_x = x[cross_idx]
-    plt.plot(cross_x, 1.0, marker='o', markersize=8, color="red")
-    plt.text(cross_x + 0.02, 0.82, f"{S['t_null']} (x={cross_x:.2f})", color='red', fontweight='bold', fontsize=15)
-    plt.title(S['g15_title'], fontweight='bold', fontsize=20)
-    plt.xlabel(S['g01_x'], fontsize=18)
-    plt.ylabel(S['g15_y'], fontsize=18)
-    plt.xlim(0, 1)
-    plt.ylim(0.4, 6.2)
-    plt.legend(loc="upper left", frameon=True, facecolor='white', framealpha=0.9)
-    plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "G15_Paradoxo_Especialista.png"))
-
-    # ================= EMPÍRICOS =================
-    if df is not None:
-        # --- EXP 1 ---
-        df_exp1 = df[(df['group'] == 'Exp1_Scalability') & (df['feasible'] == 1)]
-        if not df_exp1.empty:
-            plt.figure(figsize=(8, 5), dpi=300)
-            sns.boxplot(data=df_exp1, x="N", y="runtime", palette="Blues_d")
-            plt.title(S['g03_title'], fontweight="bold")
-            plt.xlabel(S['x_task'])
-            plt.ylabel(S['y_time_s'])
-            plt.yscale("log") 
-            plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G03_Scalability_Boxplot_Tasks.png"))
-
-            plt.figure(figsize=(8, 5), dpi=300)
-            sns.lineplot(data=df_exp1, x="N", y="runtime", marker="o", color="navy", linewidth=2)
-            plt.title(S['g04_title'], fontweight="bold")
-            plt.xlabel(S['x_task'])
-            plt.ylabel(S['y_time_avg'])
-            plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G04_Scalability_Line_Tasks.png"))
-
-            df_exp1['Vars_Bin'] = pd.qcut(df_exp1['NumVars'], q=5, precision=0, duplicates='drop')
-            plt.figure(figsize=(8, 5), dpi=300)
-            sns.boxplot(data=df_exp1, x="Vars_Bin", y="runtime", palette="Purples_d")
-            plt.title(S['g05_title'], fontweight="bold")
-            plt.xlabel(S['x_var_b'])
-            plt.ylabel(S['y_time_s'])
-            plt.xticks(rotation=15)
-            plt.yscale("log")
-            plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G05_Scalability_Boxplot_Vars.png"))
-
-            plt.figure(figsize=(8, 5), dpi=300)
-            sns.lineplot(data=df_exp1, x="NumVars", y="runtime", marker="o", color="indigo", linewidth=2)
-            plt.title(S['g06_title'], fontweight="bold")
-            plt.xlabel(S['x_var_n'])
-            plt.ylabel(S['y_time_avg'])
-            plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G06_Scalability_Line_Vars.png"))
-
-        # --- EXP 2 ---
-        df_exp2 = df[(df['group'] == 'Exp2_Behavioral') & (df['feasible'] == 1)]
-        if not df_exp2.empty:
-            plt.figure(figsize=(8, 5), dpi=300)
-            sns.lineplot(data=df_exp2, x="Cenario", y="mksp", marker="o", color="darkorange", linewidth=2.5)
-            plt.title(S['g07_title'], fontweight="bold")
-            plt.xlabel(S['x_scen'])
-            plt.ylabel(S['y_mksp_avg'])
-            plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G07_Behavioral_Line_Makespan.png"))
-
-            plt.figure(figsize=(8, 5), dpi=300)
-            sns.boxplot(data=df_exp2, x="Cenario", y="mksp", palette="Oranges")
-            plt.title(S['g08_title'], fontweight="bold")
-            plt.xlabel(S['x_scen'])
-            plt.ylabel(S['y_mksp'])
-            plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G08_Behavioral_Boxplot_Makespan.png"))
-
-            plt.figure(figsize=(8, 5), dpi=300)
-            sns.barplot(data=df_exp2, x="Cenario", y="avg_EC", palette="autumn", ci="sd")
-            plt.title(S['g09_title'], fontweight="bold")
-            plt.xlabel(S['x_scen'])
-            plt.ylabel(S['y_ec'])
-            plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G09_Behavioral_Bar_EC.png"))
-
-        # --- EXP 3 ---
-        df_exp3 = df[(df['group'] == 'Exp3_Heatmap') & (df['feasible'] == 1)]
-        if not df_exp3.empty:
-            pivot_df = df_exp3.pivot_table(values="mksp", index="M", columns="N", aggfunc="mean").round(0)
-            plt.figure(figsize=(10, 6), dpi=300)
-            sns.heatmap(pivot_df, annot=True, fmt="g", cmap="YlOrRd", linewidths=.5, 
-                        cbar_kws={'label': S['y_mksp'], 'orientation': 'horizontal', 'location': 'bottom'})
-            plt.title(S['g10_title'], fontweight="bold")
-            plt.xlabel(S['x_task'])
-            plt.ylabel(S['y_devs'])
-            plt.savefig(os.path.join(OUTPUT_DIR, "G10_Brooks_Heatmap.png"), bbox_inches='tight')
-
-            df_exp3_n50 = df_exp3[df_exp3['N'] == 50]
-            if not df_exp3_n50.empty:
-                plt.figure(figsize=(8, 5), dpi=300)
-                sns.lineplot(data=df_exp3_n50, x="M", y="mksp", marker="s", color="firebrick", linewidth=2.5)
-                plt.title(S['g11_title'], fontweight="bold")
-                plt.xlabel(S['x_devs'])
-                plt.ylabel(S['y_mksp'])
-                plt.tight_layout()
-                plt.savefig(os.path.join(OUTPUT_DIR, "G11_Brooks_Asymptote.png"))
-
-        # --- EXP 4 ---
-        df_exp4 = df[df['group'] == 'Exp4_Precedence']
-        if not df_exp4.empty:
-            df_viab = df_exp4.groupby("Density")["feasible"].mean().reset_index()
-            df_viab["feasible"] *= 100
+    # =========================================================================
+    # PARTE 1: GRÁFICOS OBRIGATÓRIOS POR INSTÂNCIA (3x3 = 9 Gráficos)
+    # =========================================================================
+    for pasta in pastas_resultados:
+        nome_cen_full = os.path.basename(pasta)
+        nome_cen = nome_cen_full.replace("Cenario_", "")
+        arquivo_csv = os.path.join(pasta, "allocations_super.csv")
+        
+        if os.path.exists(arquivo_csv):
+            df = pd.read_csv(arquivo_csv)
+            # Adiciona ao global para depois
+            df["Cenario_Nome"] = nome_cen
+            df_global = pd.concat([df_global, df], ignore_index=True)
             
-            plt.figure(figsize=(8, 5), dpi=300)
-            sns.lineplot(data=df_exp4[df_exp4['feasible']==1], x="Density", y="mksp", marker="o", color="purple", linewidth=2)
-            plt.title(S['g12_title'], fontweight="bold")
-            plt.xlabel(S['x_dens'])
-            plt.ylabel(S['y_mksp'])
-            plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G12_Precedence_Makespan.png"))
-
-            plt.figure(figsize=(8, 5), dpi=300)
-            sns.barplot(data=df_viab, x="Density", y="feasible", color="mediumpurple")
-            plt.title(S['g13_title'], fontweight="bold")
-            plt.xlabel(S['x_dens'])
-            plt.ylabel(S['y_feas'])
-            plt.ylim(0, 105)
-            plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G13_Precedence_Feasibility.png"))
-
-        # --- EXP 5 ---
-        df_exp5 = df[(df['group'] == 'Exp5_Surplus') & (df['feasible'] == 1)]
-        if not df_exp5.empty:
-            plt.figure(figsize=(8, 5), dpi=300)
-            sns.lineplot(data=df_exp5, x="TechLvl", y="mksp", marker="D", color="teal", linewidth=2)
-            plt.title(S['g14_title'], fontweight="bold")
-            plt.xlabel(S['x_tech'])
-            plt.ylabel(S['y_mksp'])
-            plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G14_Surplus_Makespan.png"))
+            # --- 1. Gráfico de Gantt Tradicional ---
+            plt.figure(figsize=(12, 6))
+            cores_devs = sns.color_palette("husl", df["Dev"].nunique())
+            for idx, dev in enumerate(sorted(df["Dev"].unique())):
+                df_dev = df[df["Dev"] == dev]
+                for _, row in df_dev.iterrows():
+                    plt.barh(y=row["Dev"], width=row["T_Din"], left=row["Inicio"], 
+                             color=cores_devs[idx], edgecolor="black", alpha=0.8)
+                    plt.text(row["Inicio"] + row["T_Din"]/2, row["Dev"], row["Tarefa"].replace("T",""), 
+                             ha='center', va='center', color='black', fontsize=7)
             
-    # Fecha todos os plots da rodada para liberar memória antes do próximo idioma
-    plt.close('all')
+            plt.title(f"Gantt: {nome_cen}", fontweight='bold')
+            plt.xlabel("Horas Úteis")
+            plt.tight_layout()
+            plt.savefig(f"{pasta_plots}/01_Gantt_{nome_cen}.png", dpi=150)
+            plt.close()
 
-print("")
+            # --- 2. Decomposição de Tempo: Nominal vs. Dinâmico (Múltiplos e Bônus) ---
+            # Vamos pegar as 10 tarefas mais longas para não poluir
+            df_tarefa = df.groupby("Tarefa").agg({
+                "T_Nominal_Original": "first",
+                "T_Din": "sum",
+                "F_Beh_EC": "mean",
+                "P_Phi_Fadiga": "mean",
+                "B_Apr_Acumulado": "mean"
+            }).reset_index().nlargest(10, "T_Din")
+            
+            x = np.arange(len(df_tarefa))
+            width = 0.35
+            
+            fig, ax = plt.subplots(figsize=(12, 6))
+            ax.bar(x - width/2, df_tarefa["T_Nominal_Original"], width, label='Tempo Nominal', color='gray', alpha=0.5)
+            ax.bar(x + width/2, df_tarefa["T_Din"], width, label='Tempo Dinâmico (Final)', color='darkred', alpha=0.8)
+            
+            ax.set_ylabel('Horas')
+            ax.set_title(f"Decomposição de Tempo (Top 10): {nome_cen}", fontweight='bold')
+            ax.set_xticks(x)
+            ax.set_xticklabels(df_tarefa["Tarefa"], rotation=45)
+            ax.legend()
+            plt.tight_layout()
+            plt.savefig(f"{pasta_plots}/02_Tempo_Decomposicao_{nome_cen}.png", dpi=150)
+            plt.close()
+
+            # --- 3. Pizza: Distribuição de Tamanho de Equipe por Tarefa ---
+            df_equipe = df.groupby("Tarefa")["Dev"].nunique().reset_index(name="Tam_Equipe")
+            dist_equipe = df_equipe["Tam_Equipe"].value_counts().sort_index()
+            
+            plt.figure(figsize=(8, 8))
+            labels = [f"{k} Devs" for k in dist_equipe.index]
+            plt.pie(dist_equipe, labels=labels, autopct='%1.1f%%', startangle=140, colors=sns.color_palette("pastel"))
+            plt.title(f"Trabalho em Equipe: {nome_cen}", fontweight='bold')
+            plt.axis('equal')
+            plt.tight_layout()
+            plt.savefig(f"{pasta_plots}/03_Pizza_Equipe_{nome_cen}.png", dpi=150)
+            plt.close()
+
+    # =========================================================================
+    # PARTE 2: BRAINSTORMING CRIATIVO (Comparativos e Malucos)
+    # =========================================================================
+    if df_global.empty: return
+
+    # --- 04. Barras: Comparação de Makespan Total (Dias Úteis) ---
+    plt.figure(figsize=(10, 6))
+    makespan = df_global.groupby("Cenario_Nome")["Fim"].max() / 8.0 # Convertendo p dias
+    sns.barplot(x=makespan.index, y=makespan.values, palette="muted")
+    plt.title("Makespan Total do Projeto (Dias Úteis)", fontweight='bold')
+    plt.ylabel("Dias")
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/04_Global_Makespan_Dias.png", dpi=150)
+    plt.close()
+
+    # --- 05. Barras: Tempo de Execução do Solver (Segundos) ---
+    plt.figure(figsize=(10, 6))
+    runtime = df_global.groupby("Cenario_Nome")["Runtime"].first()
+    sns.barplot(x=runtime.index, y=runtime.values, palette="dark")
+    plt.title("Tempo de Execução do Solver Gurobi", fontweight='bold')
+    plt.ylabel("Segundos")
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/05_Global_Runtime.png", dpi=150)
+    plt.close()
+
+    # --- 06. Barras: MIPGap Final alcançado ---
+    plt.figure(figsize=(10, 6))
+    gap = df_global.groupby("Cenario_Nome")["MIPGap"].first()
+    sns.barplot(x=gap.index, y=gap.values, palette="deep")
+    plt.title("MIPGap Final do Solver (%)", fontweight='bold')
+    plt.ylabel("%")
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/06_Global_MIPGap.png", dpi=150)
+    plt.close()
+
+    # --- 07. Boxplot Comparativo: Penalidade Comportamental (F_Beh_EC) ---
+    plt.figure(figsize=(12, 6))
+    sns.boxplot(data=df_global, x="Cenario_Nome", y="F_Beh_EC", palette="Set2")
+    plt.axhline(1.0, color='red', linestyle='--')
+    plt.title("Distribuição do Fator Comportamental ($F_{beh}$) por Cenário", fontweight='bold')
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/07_Boxplot_EC_Comparativo.png", dpi=150)
+    plt.close()
+
+    # --- 08. Boxplot Comparativo: Bônus de Aprendizado Capturado ---
+    plt.figure(figsize=(12, 6))
+    # Filtra apenas alocações que tiveram bônus p não sujar o boxplot
+    sns.boxplot(data=df_global[df_global["B_Apr_Acumulado"] > 0], x="Cenario_Nome", y="B_Apr_Acumulado", palette="crest")
+    plt.title("Distribuição do Bônus de Aprendizado Capturado ($B^{apr}$)", fontweight='bold')
+    plt.ylabel("Redução Percentual")
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/08_Boxplot_Aprendizado.png", dpi=150)
+    plt.close()
+
+    # --- 09. Stacked Bar: Composição Total de Horas de Projeto ---
+    df_global_horas = df_global.groupby("Cenario_Nome").agg({
+        "T_Nominal_Original": "sum",
+        "T_Din": "sum"
+    }).reset_index()
+    # "Atrito Sistêmico" = Dinâmico - Nominal (pode ser negativo se bônus > penalidade)
+    df_global_horas["Atrito Sistêmico (Púnição - Bônus)"] = df_global_horas["T_Din"] - df_global_horas["T_Nominal_Original"]
+    
+    plt.figure(figsize=(10, 6))
+    plt.bar(df_global_horas["Cenario_Nome"], df_global_horas["T_Nominal_Original"], label='Horas Base', color='gray', alpha=0.6)
+    # Mostra apenas sobrecarga positiva p não complicar o gráficoStacked
+    plt.bar(df_global_horas["Cenario_Nome"], np.maximum(0, df_global_horas["Atrito Sistêmico (Púnição - Bônus)"]), 
+            bottom=df_global_horas["T_Nominal_Original"], label='Sobrecarga Otimizada', color='darkred')
+    plt.title("Composição Total de Horas Alocadas", fontweight='bold')
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/09_Global_Composicao_Horas.png", dpi=150)
+    plt.close()
+
+    # --- 10. Mapa de Calor: % de Aproveitamento da Sprint (Trabalho Real vs. Capacidade) ---
+    # Capacidade útil por Dev/Sprint = 92.4h (14 dias * 8h * 0.9 buffer - 8h cerimonia)
+    capacidade_util = (14 * 8 - 8) * 0.9 
+    df_util = df_global.groupby(["Cenario_Nome", "Sprint", "Dev"])["T_Din"].sum().reset_index()
+    df_util["Utilizacao_%"] = (df_util["T_Din"] / capacidade_util) * 100
+    
+    # Vamos gerar um mapa de calor para CADA cenário p não poluir
+    for cen in df_global["Cenario_Nome"].unique():
+        df_cen = df_util[df_util["Cenario_Nome"] == cen]
+        pivot_util = df_cen.pivot(index="Dev", columns="Sprint", values="Utilizacao_%").fillna(0)
+        
+        plt.figure(figsize=(12, 6))
+        sns.heatmap(pivot_util, cmap="YlGnBu", annot=True, fmt=".0f", cbar_kws={'label': '% Utilização'})
+        plt.title(f"Aproveitamento de Sprint (%): {cen}", fontweight='bold')
+        plt.tight_layout()
+        plt.savefig(f"{pasta_plots}/10_Heatmap_Utilizacao_{cen}.png", dpi=150)
+        plt.close()
+
+    # --- 11. Mapa de Calor Global: Multitarefa (Tarefas Simultâneas por Sprint) ---
+    df_multi = df_global.groupby(["Cenario_Nome", "Sprint", "Dev"])["Tarefa"].nunique().reset_index(name="Qtd_Tarefas")
+    # Média global de multitarefa p cada Dev/Cenário
+    pivot_multi = df_multi.groupby(["Dev", "Cenario_Nome"])["Qtd_Tarefas"].mean().unstack().fillna(0)
+    
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(pivot_multi, cmap="Reds", annot=True, fmt=".1f")
+    plt.title("Média de Tarefas Simultâneas por Sprint (Limite Weinberg = 5)", fontweight='bold')
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/11_Global_Heatmap_Multitarefa.png", dpi=150)
+    plt.close()
+
+    # --- 12. Ranking: Top 5 Devs que mais capturaram Bônus de Aprendizado ---
+    plt.figure(figsize=(10, 6))
+    rank_apr = df_global.groupby("Dev")["B_Apr_Acumulado"].sum().nlargest(5)
+    sns.barplot(x=rank_apr.index, y=rank_apr.values, palette="viridis")
+    plt.title("Ranking: Top 5 Devs Ecoeficientes (Soma de Bônus $B^{apr}$)", fontweight='bold')
+    plt.ylabel("Soma de Redução Percentual")
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/12_Ranking_Eco_Devs.png", dpi=150)
+    plt.close()
+
+    # --- 13. Ranking: Top 5 Devs que mais sofreram com EC (EC > 1.0) ---
+    plt.figure(figsize=(10, 6))
+    rank_ec = df_global[df_global["F_Beh_EC"] > 1.0].groupby("Dev")["T_Din"].count().nlargest(5)
+    sns.barplot(x=rank_ec.index, y=rank_ec.values, palette="magma")
+    plt.title("Ranking: Top 5 Devs com Maior Volume de Atrito EC", fontweight='bold')
+    plt.ylabel("Qtd de Alocações com $F_{beh} > 1$")
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/13_Ranking_Atrito_Devs.png", dpi=150)
+    plt.close()
+
+    # --- 14. Histograma: Distribuição de todas as Durações de Tarefa Finais ---
+    plt.figure(figsize=(10, 6))
+    sns.histplot(df_global["T_Din"], kde=True, bins=30, color="darkblue")
+    plt.title("Distribuição Global de Durações de Tarefa Finais", fontweight='bold')
+    plt.xlabel("Horas")
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/14_Global_Histograma_Duracao.png", dpi=150)
+    plt.close()
+
+    # --- 15. Scatter Plot Maluco: Complexidade Técnica vs. Atrito Comportamental ---
+    plt.figure(figsize=(12, 8))
+    sns.scatterplot(data=df_global, x="F_Tech_ET", y="F_Beh_EC", hue="Cenario_Nome", style="Dev", s=100, alpha=0.6)
+    plt.axhline(1.0, color='gray', linestyle='--')
+    plt.axvline(1.0, color='gray', linestyle='--')
+    plt.title("Relação Maluca: Complexidade Técnica vs. Atrito EC", fontweight='bold')
+    plt.xlabel("Fator Técnico ($F_{tech}$: 1=Fácil, 0.1=Difícil)")
+    plt.ylabel("Fator Comportamental ($F_{beh}$: 1=Alinhado, >1=Ruído)")
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/15_ScatterMalco_ET_vs_EC.png", dpi=150)
+    plt.close()
+
+    # --- 16. Boxplot Maluco: Distribuição de Fadiga acumulada na Sprint ---
+    plt.figure(figsize=(12, 6))
+    sns.boxplot(data=df_global, x="Cenario_Nome", y="P_Phi_Fadiga", palette="coolwarm")
+    plt.title("Distribuição da Penalidade de Fadiga ($P_{\phi}$) por Cenário", fontweight='bold')
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/16_Boxplot_Fadiga.png", dpi=150)
+    plt.close()
+
+    # --- 17. Barras: Média global do Índice de Carga Cognitiva sustentável ---
+    plt.figure(figsize=(10, 6))
+    cg_idx = df_global.groupby("Cenario_Nome")["Cg_Idx_Sustentabilidade"].mean()
+    sns.barplot(x=cg_idx.index, y=cg_idx.values, palette="plasma")
+    plt.axhline(0.10, color='red', linestyle='--', label='Limiar L_fat')
+    plt.title("Média do Índice de Carga Cognitiva ($Cg_{\%}$) (Sustentabilidade)", fontweight='bold')
+    plt.ylabel("Índice (0 a 1)")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/17_Global_Carga_Cognitiva.png", dpi=150)
+    plt.close()
+
+    # --- 18. Mapa de Calor Global: Média de Penalidade de Contexto por Dev/Cenário ---
+    plt.figure(figsize=(10, 8))
+    pivot_ctx = df_global.groupby(["Dev", "Cenario_Nome"])["P_Ctx"].mean().unstack().fillna(0)
+    sns.heatmap(pivot_ctx, cmap="Oranges", annot=True, fmt=".2f")
+    plt.title("Média de Penalidade por Contexto ($P_{ctx}$) por Dev", fontweight='bold')
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/18_Global_Heatmap_Contexto.png", dpi=150)
+    plt.close()
+
+    # --- 19. Radar Plot (Maluco): Comparação de Bônus e Penalidades Médias ---
+    # Este precisa de processamento extra p normalizar
+    metricas = ["F_Beh_EC", "P_Phi_Fadiga", "B_Apr_Acumulado", "P_Ctx"]
+    df_radar = df_global.groupby("Cenario_Nome")[metricas].mean().reset_index()
+    # Normaliza B_Apr p ficar na mesma escala (0-1)
+    df_radar["B_Apr_Acumulado"] = df_radar["B_Apr_Acumulado"] / df_radar["B_Apr_Acumulado"].max()
+    # Normaliza Fadiga
+    df_radar["P_Phi_Fadiga"] = df_radar["P_Phi_Fadiga"] / df_radar["P_Phi_Fadiga"].max()
+    
+    # Plotar Radar exige matplotlib puro, vamos pular esse p simplificar o brainstorming
+    # p/ o SBPO e fazer um ViolinPlot comparativo de Multiplicadores Finais
+
+    # --- 19. ViolinPlot Comparativo de Multiplicadores Finais de Tempo ---
+    plt.figure(figsize=(12, 6))
+    sns.violinplot(data=df_global, x="Cenario_Nome", y="F_Total_Multiplicador", inner="quart", palette="pastel")
+    plt.axhline(1.0, color='red', linestyle='--')
+    plt.title("Distribuição do Multiplicador Final de Tempo ($F_{total}$)", fontweight='bold')
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/19_Violin_Multiplicador_Final.png", dpi=150)
+    plt.close()
+
+    # --- 20. Tabela Plot (Maluco): Ranking de Tarefas por Atrito Comportamental Médio ---
+    tarefas_ranking_ec = df_global.groupby("Tarefa")["F_Beh_EC"].mean().nlargest(10).reset_index()
+    tarefas_ranking_ec.columns = ["Tarefa", "Atrito EC Médio"]
+    
+    # Gera uma imagem de tabela
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.axis('off')
+    tbl = plt.table(cellText=tarefas_ranking_ec.values, colLabels=tarefas_ranking_ec.columns, loc='center', cellLoc='center')
+    tbl.set_fontsize(12)
+    tbl.scale(1.2, 1.2)
+    plt.title("Ranking: Top 10 Tarefas com Maior Atrito Comportamental Médio", fontweight='bold')
+    plt.tight_layout()
+    plt.savefig(f"{pasta_plots}/20_Tabela_Ranking_EC_Tarefas.png", dpi=150)
+    plt.close()
+
+    print(f"✅ Brainstorming Finalizado! Cerca de 20 gráficos comparativos gerados além dos 9 obrigatórios.")
+
+if __name__ == "__main__":
+    plt.rcParams.update({'font.size': 100})
+    gerar_brainstorming_completo()
