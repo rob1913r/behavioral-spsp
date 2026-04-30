@@ -63,7 +63,7 @@ def solve_managerial_poc(file_path):
     
     model = gp.Model("SPSP_MILP", env=env)
     
-    model.Params.TimeLimit = 14400 # Limite de 4 horas para otimização, dada a complexidade do modelo.
+    model.Params.TimeLimit = 36000 # 10 de tempo limite
     model.Params.MIPGap = 0.05 # Permitir até 5% de gap para encontrar soluções mais rapidamente, dada a complexidade do modelo.
     
     lmbda = model.addVars(M, N, S, F_fracs, vtype=GRB.BINARY)
