@@ -57,8 +57,8 @@ def run_solver(filepath):
     # Inicialização do modelo Gurobi
     model = gp.Model("TaskAllocation")
     model.setParam("OutputFlag", 0)   # Execução silenciosa
-    model.setParam("TimeLimit", 1) # Limite de 1 hora por instância
-    model.setParam("MIPGap", 0.1)     # MIPGap de 0,1%
+    model.setParam("TimeLimit", 3600) # Limite de 1 hora por instância
+    model.setParam("MIPGap", 0.001)   # Gap de 0.1% para soluções praticamente ótimas
 
     # Variáveis de Decisão
     x = model.addVars(M, N, S_max, vtype=GRB.BINARY, name="x")
