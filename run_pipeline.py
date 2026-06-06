@@ -18,9 +18,7 @@ def clean_directories():
     """Remove pastas de dados dinâmicos para garantir uma execução limpa."""
     dirs_to_clean = [
         os.path.join(BASE_DIR, "data", "instances"),
-        os.path.join(BASE_DIR, "data", "results"),
-        os.path.join(BASE_DIR, "docs", "paper-pt", "figures"),
-        os.path.join(BASE_DIR, "docs", "paper-en", "figures")
+        os.path.join(BASE_DIR, "data", "results")
     ]
     
     for d in dirs_to_clean:

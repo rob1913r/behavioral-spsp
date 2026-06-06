@@ -29,7 +29,7 @@ sns.set_theme(style="whitegrid", palette="muted", font_scale=1.5)
 # ==============================================================================
 LANG_STR = {
     'pt': {
-        'out_dir': os.path.join("docs", "paper-pt", "figures"),
+        'out_dir': os.path.join("data", "results", "figures-pt"),
         # G01
         'g01_title': "Modelagem do Impacto Comportamental por Zonas de Risco",
         'g01_x': "Desalinhamento Comportamental (0.0 a 1.0)",
@@ -73,7 +73,7 @@ LANG_STR = {
         'x_tech': "Nível de Proficiência Técnica"
     },
     'en': {
-        'out_dir': os.path.join("docs", "paper-en", "figures"),
+        'out_dir': os.path.join("data", "results", "figures-en"),
         # G01
         'g01_title': "Modeling Behavioral Impact by Risk Zones",
         'g01_x': "Behavioral Misalignment (0.0 to 1.0)",
@@ -101,7 +101,7 @@ LANG_STR = {
         # G07, G08, G09
         'g07_title': "Schedule Evolution under Noise",
         'g08_title': "Makespan Variance in Critical Scenarios",
-        'g09_title': "Growth of Behavioral Error (BE)",
+        'g09_title': "Growth of Behavioral Error (EC)",
         'x_scen': "Behavioral Scenario", 'y_mksp': "Makespan (Days)", 
         'y_mksp_avg': "Average Makespan (Days)", 'y_ec': "Average Behavioral Error (BE)",
         # G10 & G11
@@ -142,9 +142,9 @@ for lang in ['pt', 'en']:
 
     # --- G01 ---
     plt.figure(figsize=(10, 6), dpi=300)
-    plt.axvspan(0.0, 0.3, color='limegreen', alpha=0.15, label=S['z_acc'])
-    plt.axvspan(0.3, 0.7, color='orange', alpha=0.15, label=S['z_crit'])
-    plt.axvspan(0.7, 1.0, color='crimson', alpha=0.15, label=S['z_ext'])
+    plt.axvspan(0.0, 0.3, color='#c7e9c0', alpha=0.15, label=S['z_acc'])
+    plt.axvspan(0.3, 0.7, color='#ffe6a3', alpha=0.15, label=S['z_crit'])
+    plt.axvspan(0.7, 1.0, color='#f4b6b3', alpha=0.15, label=S['z_ext'])
     plt.plot(x, 1.0 + (k_fixed * x), label=S['l_lin'], color='gray', linestyle=':', linewidth=2)
     plt.plot(x, 1.0 + (k_fixed * (x**2)), label=S['l_quad'], color='steelblue', linestyle='--', linewidth=2)
     plt.plot(x, 1.0 + (k_fixed * (x**3)), label=S['l_cub'], color='indigo', linewidth=3.5)
@@ -157,13 +157,13 @@ for lang in ['pt', 'en']:
     plt.ylim(0.8, 6.2)
     plt.legend(loc="upper left", frameon=True, facecolor='white', framealpha=0.9)
     plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "G01_Justificativa_Matematica.png"))
+    plt.savefig(os.path.join(OUTPUT_DIR, "G01_Justificativa_Matematica.eps"))
 
     # --- G02 ---
     plt.figure(figsize=(10, 6), dpi=300)
-    plt.axvspan(0.0, 0.3, color='limegreen', alpha=0.15, label=S['z_acc'])
-    plt.axvspan(0.3, 0.7, color='orange', alpha=0.15, label=S['z_crit'])
-    plt.axvspan(0.7, 1.0, color='crimson', alpha=0.15, label=S['z_ext'])
+    plt.axvspan(0.0, 0.3, color='#c7e9c0', alpha=0.15, label=S['z_acc'])
+    plt.axvspan(0.3, 0.7, color='#ffe6a3', alpha=0.15, label=S['z_crit'])
+    plt.axvspan(0.7, 1.0, color='#f4b6b3', alpha=0.15, label=S['z_ext'])
     plt.plot(x, 1.0 + (2.0 * (x**3)), label=S['k2'], color='lightgray', linestyle='-.', linewidth=2)
     plt.plot(x, 1.0 + (4.0 * (x**3)), label='k=4', color='darkgray', linestyle='--', linewidth=2)
     plt.plot(x, 1.0 + (5.0 * (x**3)), label=S['k5'], color='indigo', linewidth=3.5)
@@ -183,13 +183,13 @@ for lang in ['pt', 'en']:
     plt.ylim(0.8, 11.5)
     plt.legend(loc="upper left", frameon=True, facecolor='white', framealpha=0.9)
     plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "G02_Calibracao_K.png"))
+    plt.savefig(os.path.join(OUTPUT_DIR, "G02_Calibracao_K.eps"))
 
     # --- G15 ---
     plt.figure(figsize=(10, 6), dpi=300)
-    plt.axvspan(0.0, 0.3, color='limegreen', alpha=0.15)
-    plt.axvspan(0.3, 0.7, color='orange', alpha=0.15)
-    plt.axvspan(0.7, 1.0, color='crimson', alpha=0.15)
+    plt.axvspan(0.0, 0.3, color='#c7e9c0', alpha=0.15)
+    plt.axvspan(0.3, 0.7, color='#ffe6a3', alpha=0.15)
+    plt.axvspan(0.7, 1.0, color='#f4b6b3', alpha=0.15)
     y_junior = 1.0 + (5.0 * (x**3)) - (0.5 * 0.0) 
     y_pleno = 1.0 + (5.0 * (x**3)) - (0.5 * 0.5)  
     y_senior = 1.0 + (5.0 * (x**3)) - (0.5 * 1.0) 
@@ -209,7 +209,7 @@ for lang in ['pt', 'en']:
     plt.ylim(0.4, 6.2)
     plt.legend(loc="upper left", frameon=True, facecolor='white', framealpha=0.9)
     plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "G15_Paradoxo_Especialista.png"))
+    plt.savefig(os.path.join(OUTPUT_DIR, "G15_Paradoxo_Especialista.eps"))
 
     # ================= EMPÍRICOS =================
     if df is not None:
@@ -223,7 +223,7 @@ for lang in ['pt', 'en']:
             plt.ylabel(S['y_time_s'])
             plt.yscale("log") 
             plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G03_Scalability_Boxplot_Tasks.png"))
+            plt.savefig(os.path.join(OUTPUT_DIR, "G03_Scalability_Boxplot_Tasks.eps"))
 
             plt.figure(figsize=(8, 5), dpi=300)
             sns.lineplot(data=df_exp1, x="N", y="runtime", marker="o", color="navy", linewidth=2)
@@ -231,7 +231,7 @@ for lang in ['pt', 'en']:
             plt.xlabel(S['x_task'])
             plt.ylabel(S['y_time_avg'])
             plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G04_Scalability_Line_Tasks.png"))
+            plt.savefig(os.path.join(OUTPUT_DIR, "G04_Scalability_Line_Tasks.eps"))
 
             df_exp1['Vars_Bin'] = pd.qcut(df_exp1['NumVars'], q=5, precision=0, duplicates='drop')
             plt.figure(figsize=(8, 5), dpi=300)
@@ -242,7 +242,7 @@ for lang in ['pt', 'en']:
             plt.xticks(rotation=15)
             plt.yscale("log")
             plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G05_Scalability_Boxplot_Vars.png"))
+            plt.savefig(os.path.join(OUTPUT_DIR, "G05_Scalability_Boxplot_Vars.eps"))
 
             plt.figure(figsize=(8, 5), dpi=300)
             sns.lineplot(data=df_exp1, x="NumVars", y="runtime", marker="o", color="indigo", linewidth=2)
@@ -250,7 +250,7 @@ for lang in ['pt', 'en']:
             plt.xlabel(S['x_var_n'])
             plt.ylabel(S['y_time_avg'])
             plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G06_Scalability_Line_Vars.png"))
+            plt.savefig(os.path.join(OUTPUT_DIR, "G06_Scalability_Line_Vars.eps"))
 
         # --- EXP 2 ---
         df_exp2 = df[(df['group'] == 'Exp2_Behavioral') & (df['feasible'] == 1)]
@@ -261,7 +261,7 @@ for lang in ['pt', 'en']:
             plt.xlabel(S['x_scen'])
             plt.ylabel(S['y_mksp_avg'])
             plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G07_Behavioral_Line_Makespan.png"))
+            plt.savefig(os.path.join(OUTPUT_DIR, "G07_Behavioral_Line_Makespan.eps"))
 
             plt.figure(figsize=(8, 5), dpi=300)
             sns.boxplot(data=df_exp2, x="Cenario", y="mksp", palette="Oranges")
@@ -269,7 +269,7 @@ for lang in ['pt', 'en']:
             plt.xlabel(S['x_scen'])
             plt.ylabel(S['y_mksp'])
             plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G08_Behavioral_Boxplot_Makespan.png"))
+            plt.savefig(os.path.join(OUTPUT_DIR, "G08_Behavioral_Boxplot_Makespan.eps"))
 
             plt.figure(figsize=(8, 5), dpi=300)
             sns.barplot(data=df_exp2, x="Cenario", y="avg_EC", palette="autumn", ci="sd")
@@ -277,7 +277,7 @@ for lang in ['pt', 'en']:
             plt.xlabel(S['x_scen'])
             plt.ylabel(S['y_ec'])
             plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G09_Behavioral_Bar_EC.png"))
+            plt.savefig(os.path.join(OUTPUT_DIR, "G09_Behavioral_Bar_EC.eps"))
 
         # --- EXP 3 ---
         df_exp3 = df[(df['group'] == 'Exp3_Heatmap') & (df['feasible'] == 1)]
@@ -289,7 +289,7 @@ for lang in ['pt', 'en']:
             plt.title(S['g10_title'], fontweight="bold")
             plt.xlabel(S['x_task'])
             plt.ylabel(S['y_devs'])
-            plt.savefig(os.path.join(OUTPUT_DIR, "G10_Brooks_Heatmap.png"), bbox_inches='tight')
+            plt.savefig(os.path.join(OUTPUT_DIR, "G10_Brooks_Heatmap.eps"), bbox_inches='tight')
 
             df_exp3_n50 = df_exp3[df_exp3['N'] == 50]
             if not df_exp3_n50.empty:
@@ -299,7 +299,7 @@ for lang in ['pt', 'en']:
                 plt.xlabel(S['x_devs'])
                 plt.ylabel(S['y_mksp'])
                 plt.tight_layout()
-                plt.savefig(os.path.join(OUTPUT_DIR, "G11_Brooks_Asymptote.png"))
+                plt.savefig(os.path.join(OUTPUT_DIR, "G11_Brooks_Asymptote.eps"))
 
         # --- EXP 4 ---
         df_exp4 = df[df['group'] == 'Exp4_Precedence']
@@ -313,7 +313,7 @@ for lang in ['pt', 'en']:
             plt.xlabel(S['x_dens'])
             plt.ylabel(S['y_mksp'])
             plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G12_Precedence_Makespan.png"))
+            plt.savefig(os.path.join(OUTPUT_DIR, "G12_Precedence_Makespan.eps"))
 
             plt.figure(figsize=(8, 5), dpi=300)
             sns.barplot(data=df_viab, x="Density", y="feasible", color="mediumpurple")
@@ -322,7 +322,7 @@ for lang in ['pt', 'en']:
             plt.ylabel(S['y_feas'])
             plt.ylim(0, 105)
             plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G13_Precedence_Feasibility.png"))
+            plt.savefig(os.path.join(OUTPUT_DIR, "G13_Precedence_Feasibility.eps"))
 
         # --- EXP 5 ---
         df_exp5 = df[(df['group'] == 'Exp5_Surplus') & (df['feasible'] == 1)]
@@ -333,7 +333,7 @@ for lang in ['pt', 'en']:
             plt.xlabel(S['x_tech'])
             plt.ylabel(S['y_mksp'])
             plt.tight_layout()
-            plt.savefig(os.path.join(OUTPUT_DIR, "G14_Surplus_Makespan.png"))
+            plt.savefig(os.path.join(OUTPUT_DIR, "G14_Surplus_Makespan.eps"))
             
     # Fecha todos os plots da rodada para liberar memória antes do próximo idioma
     plt.close('all')
