@@ -58,7 +58,7 @@ def run_solver(filepath):
     model = gp.Model("TaskAllocation")
     model.setParam("OutputFlag", 0)   # Execução silenciosa
     model.setParam("TimeLimit", 3600) # Limite de 1 hora por instância
-    model.setParam("MIPGap", 0.001)   # Gap de 0.1% para soluções praticamente ótimas
+    model.setParam("MIPGap", 0.01)    # Gap de 1% para soluções praticamente ótimas
 
     # Variáveis de Decisão
     x = model.addVars(M, N, S_max, vtype=GRB.BINARY, name="x")
