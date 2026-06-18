@@ -4,19 +4,18 @@ env/
 __pycache__/
 *.pyc
 *.pyo
+.pdca_backups/
 
 # Logs e Arquivos do Gurobi
 gurobi.log
 *.lp
 *.sol
 
-# Dados gerados dinamicamente (Instancias e Resultados)
-data/instances/
-data/results/
+# Dados gerados dinamicamente (instâncias, resultados, gráficos)
+data/
 
-# Graficos gerados dinamicamente pelo plot_gen.py
-docs/paper-pt/figures/*.png
-docs/paper-en/figures/*.png
+# Artigos e Documentação (gerados/compilados)
+docs/
 
 # Arquivos temporarios do compilador LaTeX
 *.aux

@@ -1,0 +1,55 @@
+Instancia: Cenario_2_Monolitos_Equipe
+Tmax: 425.19h  Gap: 223.96%
+
+ Eq. kind mode     status      #viol   max_viol  descricao
+-----------------------------------------------------------------------------------------------
+   6 h    ENFORCE  OK              0     0.0000  u define tamanho de team = z
+   7 h    ENFORCE  OK              0     0.0000  sum_w = sum d.u
+   8 h    ENFORCE  OK              0     0.0000  w = sum lambda (fracao valida)
+   9 g    ENFORCE  OK              0     0.0000  y <= w (linearizacao Team Match)
+  10 g    ENFORCE  OK              0     0.0000  y <= u (linearizacao Team Match)
+  11 g    ENFORCE  OK              0     0.0000  y >= w + u - 1
+  12 h    ENFORCE  OK              0     0.0000  definition Peq (perfil medio)
+  13 g    ENFORCE  OK              0     0.0000  Dev >= Peq - 0.25
+  14 g    ENFORCE  OK              0     0.0000  Dev >= 0.25 - Peq
+  15 h    ENFORCE  OK              0     0.0000  definition P_match (Team Match)
+  16 g    ENFORCE  OK              0     0.0000  max 5 tasks por dev/sprint
+  17 h    ENFORCE  OK              0     0.0000  definition P_ctx (contexto)
+  18 h    ENFORCE  OK              0     0.0000  definition P_com (Brooks)
+  19 h    ENFORCE  OK              0     0.0000  definition Cg (load cognitiva)
+  20 h    ENFORCE  OK              0     0.0000  definition P_phi (fadiga)
+  21 h    ENFORCE  OK              0     0.0000  definition b_axis (aprendizado)
+  22 h    ENFORCE  OK              0     0.0000  definition b_dep (aprendizado)
+  23 h    ENFORCE  OK              0     0.0000  definition B_apr total
+  24 h    ENFORCE  OK              0     0.0000  definition F_total
+  25 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= M.lambda
+  26 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= m.lambda
+  27 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= F_tot - m(1-l)
+  28 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= F_tot - M(1-l)
+  29 h    ENFORCE  OK              0     0.0000  definition T_din (+ T_aux >= 0)
+  30 h    ENFORCE  OK              0     0.0000  backlog complete (fracoes = 12/12)
+  31 h    ENFORCE  OK              0     0.0000  z = sum x
+  32 h    ENFORCE  OK              0     0.0000  exatamente 1 sprint por task
+  33 g    ENFORCE  OK              0     0.0000  inicio apos abertura da sprint
+  34 g    ENFORCE  OK              0     0.0000  Dur >= T_din de todos os devs
+  35 g    ENFORCE  OK              0     0.0000  termino dentro da janela da sprint
+  36 g    ENFORCE  OK              0     0.0000  prazo individual da task
+  37 g    WARN     AVISO           5     1.0000  coverage de skills (HdT)
+      -> T0: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T4: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T6: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T7: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T8: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+  38 g    ENFORCE  OK              0     0.0000  max 4 devs por task
+  39 h    ENFORCE  OK              0     0.0000  w = sum lambda (duplicate da Eq.8)
+  40 h    ENFORCE  OK              0     0.0000  x = multiplo de 1/12
+  41 g    ENFORCE  OK              0     0.0000  precedence + Gap_prec
+  42 g    ENFORCE  OK              0     0.0000  order definida p/ pares do dev
+  43 g    ENFORCE  OK              0     0.0000  execucao serial sem overlap
+  44 g    ENFORCE  OK              0     0.0000  v <= w_j
+  45 g    ENFORCE  OK              0     0.0000  v <= w_k
+  46 h    ENFORCE  OK              0     0.0000  definition CapUtil (93.6h)
+  47 g    ENFORCE  OK              0     0.0000  capacity util por dev/sprint
+  48 g    ENFORCE  OK              0     0.0000  Tmax cobre o fim de todas as tasks
+-----------------------------------------------------------------------------------------------
+FACTIVEL (modes ENFORCE): SIM

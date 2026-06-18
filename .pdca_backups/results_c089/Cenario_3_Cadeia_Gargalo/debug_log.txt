@@ -1,0 +1,136 @@
+
+======================================================================
+  VNS — Cenario_3_Cadeia_Gargalo
+======================================================================
+[     0.0s] [VNS] N=50 M=5 S_max=15 | LB=548.0h | T_limit=180s | seed=13
+PARAMETROS DO MODELO: alpha_axis=0.05 lmbda_apr=0.8 alpha_dep=0.2 lmbda_dep=0.6 l_fat=0.1 phi_fat=9.0 CapUtil=93.60000000000001 H_span=112 Setup=2.0
+PARAMETROS DE BUSCA: T_MULT=0.5 K_MAX=10 ILS_AFTER=32 VND_FRAC=0.4 F_PESS=2.0 LAM=(1.0,1.0,1.0)
+[     0.0s] [gulosa] fase 1 concluida — iniciando repair iterativo
+[     0.0s] [gulosa-chains] 26 chains (maior: 25), 0 tasks soltas — iniciando repair
+[    17.9s]    Start 'gulosa': Tmax=1045.2h fp=1078.2 
+[    18.7s]    Start 'gulosa-chains': Tmax=905.0h fp=934.0 
+[    18.7s]    Multi-start: vencedor = 'gulosa-chains'
+[    18.7s]    Inicial: Tmax=905.0h gap=65.1% pen_cap=0.000 pen_jan=0.000 pen_tsk=0.000
+[    18.7s]    Distribuicao por sprint: s1:11 s2:11 s3:11 s4:4 s5:3 s6:3 s7:3 s8:3 s9:1
+[    18.7s]    Diagnostico: 33 alocacoes c/ B_apr>0, 0 c/ F_tech<1
+[    18.7s]    Verificacao integral (43 restricoes) da gulosa: FACTIVEL
+ Eq. kind mode     status      #viol   max_viol  descricao
+-----------------------------------------------------------------------------------------------
+   6 h    ENFORCE  OK              0     0.0000  u define tamanho de team = z
+   7 h    ENFORCE  OK              0     0.0000  sum_w = sum d.u
+   8 h    ENFORCE  OK              0     0.0000  w = sum lambda (fracao valida)
+   9 g    ENFORCE  OK              0     0.0000  y <= w (linearizacao Team Match)
+  10 g    ENFORCE  OK              0     0.0000  y <= u (linearizacao Team Match)
+  11 g    ENFORCE  OK              0     0.0000  y >= w + u - 1
+  12 h    ENFORCE  OK              0     0.0000  definition Peq (perfil medio)
+  13 g    ENFORCE  OK              0     0.0000  Dev >= Peq - 0.25
+  14 g    ENFORCE  OK              0     0.0000  Dev >= 0.25 - Peq
+  15 h    ENFORCE  OK              0     0.0000  definition P_match (Team Match)
+  16 g    ENFORCE  OK              0     0.0000  max 5 tasks por dev/sprint
+  17 h    ENFORCE  OK              0     0.0000  definition P_ctx (contexto)
+  18 h    ENFORCE  OK              0     0.0000  definition P_com (Brooks)
+  19 h    ENFORCE  OK              0     0.0000  definition Cg (load cognitiva)
+  20 h    ENFORCE  OK              0     0.0000  definition P_phi (fadiga)
+  21 h    ENFORCE  OK              0     0.0000  definition b_axis (aprendizado)
+  22 h    ENFORCE  OK              0     0.0000  definition b_dep (aprendizado)
+  23 h    ENFORCE  OK              0     0.0000  definition B_apr total
+  24 h    ENFORCE  OK              0     0.0000  definition F_total
+  25 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= M.lambda
+  26 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= m.lambda
+  27 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= F_tot - m(1-l)
+  28 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= F_tot - M(1-l)
+  29 h    ENFORCE  OK              0     0.0000  definition T_din (+ T_aux >= 0)
+  30 h    ENFORCE  OK              0     0.0000  backlog complete (fracoes = 12/12)
+  31 h    ENFORCE  OK              0     0.0000  z = sum x
+  32 h    ENFORCE  OK              0     0.0000  exatamente 1 sprint por task
+  33 g    ENFORCE  OK              0     0.0000  inicio apos abertura da sprint
+  34 g    ENFORCE  OK              0     0.0000  Dur >= T_din de todos os devs
+  35 g    ENFORCE  OK              0     0.0000  termino dentro da janela da sprint
+  36 g    ENFORCE  OK              0     0.0000  prazo individual da task
+  37 g    WARN     OK              0     0.0000  coverage de skills (HdT)
+  38 g    ENFORCE  OK              0     0.0000  max 4 devs por task
+  39 h    ENFORCE  OK              0     0.0000  w = sum lambda (duplicate da Eq.8)
+  40 h    ENFORCE  OK              0     0.0000  x = multiplo de 1/12
+  41 g    ENFORCE  OK              0     0.0000  precedence + Gap_prec
+  42 g    ENFORCE  OK              0     0.0000  order definida p/ pares do dev
+  43 g    ENFORCE  OK              0     0.0000  execucao serial sem overlap
+  44 g    ENFORCE  OK              0     0.0000  v <= w_j
+  45 g    ENFORCE  OK              0     0.0000  v <= w_k
+  46 h    ENFORCE  OK              0     0.0000  definition CapUtil (93.6h)
+  47 g    ENFORCE  OK              0     0.0000  capacity util por dev/sprint
+  48 g    ENFORCE  OK              0     0.0000  Tmax cobre o fim de todas as tasks
+-----------------------------------------------------------------------------------------------
+FACTIVEL (modes ENFORCE): SIM
+[    18.7s]    VND inicial: Tmax=905.0h gap=65.1% feasible=SIM
+[    41.5s] [ILS it32] restart por estagnacao (32 iteracoes sem melhora)
+[    96.1s] [ILS it71] restart WRECK re-semeado (LNS do incumbent, sub-seed 2)
+[   117.7s] [gate it81] candidato feasible mas Tmax=905.2 >= best=905.0
+[   117.7s]    [MIP] varredura final fix-and-optimize (POPMUSIC)...
+[   132.1s] [mip final-sweep] strat=makespan_tail free=12 triples=470 v=4398 status=9 objGurobi=847.5 t=14.4s
+[   132.1s]       [MIP-sweep makespan_tail]  Tmax=847.5h  gap=54.7%  t=132s
+[   146.6s] [mip final-sweep] strat=critical_chain free=12 triples=470 v=4552 status=9 objGurobi=794.6 t=14.5s
+[   146.6s]       [MIP-sweep critical_chain]  Tmax=794.6h  gap=45.0%  t=147s
+[   161.1s] [mip final-sweep] strat=bottleneck_dev free=12 triples=462 v=4554 status=9 objGurobi=794.6 t=14.5s
+[   175.5s] [mip final-sweep] strat=monolith_axis free=12 triples=390 v=3220 status=9 objGurobi=794.6 t=14.4s
+[   176.3s] [mip final-sweep] strat=window free=12 triples=322 v=3576 status=2 objGurobi=794.6 t=0.8s
+[   180.5s] [mip final-sweep] strat=related free=12 triples=466 v=4600 status=9 objGurobi=794.6 t=4.3s
+
+======================================================================
+  RESULTADO — Cenario_3_Cadeia_Gargalo
+======================================================================
+[   180.6s]    Tmax=794.6h | gap=45.0% | t=180.6s | iteracoes=81 | candidatos rejeitados por infactibilidade=0
+[   180.6s]    Verificacao final (43 restricoes): FACTIVEL
+
+RELATORIO FINAL DAS 43 CONSTRAINTS:
+ Eq. kind mode     status      #viol   max_viol  descricao
+-----------------------------------------------------------------------------------------------
+   6 h    ENFORCE  OK              0     0.0000  u define tamanho de team = z
+   7 h    ENFORCE  OK              0     0.0000  sum_w = sum d.u
+   8 h    ENFORCE  OK              0     0.0000  w = sum lambda (fracao valida)
+   9 g    ENFORCE  OK              0     0.0000  y <= w (linearizacao Team Match)
+  10 g    ENFORCE  OK              0     0.0000  y <= u (linearizacao Team Match)
+  11 g    ENFORCE  OK              0     0.0000  y >= w + u - 1
+  12 h    ENFORCE  OK              0     0.0000  definition Peq (perfil medio)
+  13 g    ENFORCE  OK              0     0.0000  Dev >= Peq - 0.25
+  14 g    ENFORCE  OK              0     0.0000  Dev >= 0.25 - Peq
+  15 h    ENFORCE  OK              0     0.0000  definition P_match (Team Match)
+  16 g    ENFORCE  OK              0     0.0000  max 5 tasks por dev/sprint
+  17 h    ENFORCE  OK              0     0.0000  definition P_ctx (contexto)
+  18 h    ENFORCE  OK              0     0.0000  definition P_com (Brooks)
+  19 h    ENFORCE  OK              0     0.0000  definition Cg (load cognitiva)
+  20 h    ENFORCE  OK              0     0.0000  definition P_phi (fadiga)
+  21 h    ENFORCE  OK              0     0.0000  definition b_axis (aprendizado)
+  22 h    ENFORCE  OK              0     0.0000  definition b_dep (aprendizado)
+  23 h    ENFORCE  OK              0     0.0000  definition B_apr total
+  24 h    ENFORCE  OK              0     0.0000  definition F_total
+  25 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= M.lambda
+  26 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= m.lambda
+  27 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= F_tot - m(1-l)
+  28 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= F_tot - M(1-l)
+  29 h    ENFORCE  OK              0     0.0000  definition T_din (+ T_aux >= 0)
+  30 h    ENFORCE  OK              0     0.0000  backlog complete (fracoes = 12/12)
+  31 h    ENFORCE  OK              0     0.0000  z = sum x
+  32 h    ENFORCE  OK              0     0.0000  exatamente 1 sprint por task
+  33 g    ENFORCE  OK              0     0.0000  inicio apos abertura da sprint
+  34 g    ENFORCE  OK              0     0.0000  Dur >= T_din de todos os devs
+  35 g    ENFORCE  OK              0     0.0000  termino dentro da janela da sprint
+  36 g    ENFORCE  OK              0     0.0000  prazo individual da task
+  37 g    WARN     AVISO           3     1.0000  coverage de skills (HdT)
+      -> T15: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T16: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T20: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+  38 g    ENFORCE  OK              0     0.0000  max 4 devs por task
+  39 h    ENFORCE  OK              0     0.0000  w = sum lambda (duplicate da Eq.8)
+  40 h    ENFORCE  OK              0     0.0000  x = multiplo de 1/12
+  41 g    ENFORCE  OK              0     0.0000  precedence + Gap_prec
+  42 g    ENFORCE  OK              0     0.0000  order definida p/ pares do dev
+  43 g    ENFORCE  OK              0     0.0000  execucao serial sem overlap
+  44 g    ENFORCE  OK              0     0.0000  v <= w_j
+  45 g    ENFORCE  OK              0     0.0000  v <= w_k
+  46 h    ENFORCE  OK              0     0.0000  definition CapUtil (93.6h)
+  47 g    ENFORCE  OK              0     0.0000  capacity util por dev/sprint
+  48 g    ENFORCE  OK              0     0.0000  Tmax cobre o fim de todas as tasks
+-----------------------------------------------------------------------------------------------
+FACTIVEL (modes ENFORCE): SIM
+[   180.6s]    Saida: data\results\vns_v2\Cenario_3_Cadeia_Gargalo/allocations.csv, convergence_log.csv, vnd_log.csv, submip_log.csv, debug_log.txt, constraints_report.txt
+[   180.6s]    Matheuristica: 1 chamadas de sub-MIP, 2 melhorias aceitas (Gurobi)

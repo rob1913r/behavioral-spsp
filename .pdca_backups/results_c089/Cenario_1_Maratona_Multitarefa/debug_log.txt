@@ -1,0 +1,126 @@
+
+======================================================================
+  VNS — Cenario_1_Maratona_Multitarefa
+======================================================================
+[     0.0s] [VNS] N=75 M=5 S_max=15 | LB=180.0h | T_limit=210s | seed=42
+PARAMETROS DO MODELO: alpha_axis=0.05 lmbda_apr=0.8 alpha_dep=0.2 lmbda_dep=0.6 l_fat=0.1 phi_fat=9.0 CapUtil=93.60000000000001 H_span=112 Setup=2.0
+PARAMETROS DE BUSCA: T_MULT=0.5 K_MAX=10 ILS_AFTER=32 VND_FRAC=0.4 F_PESS=2.0 LAM=(1.0,1.0,1.0)
+[     0.0s] [gulosa] fase 1 concluida — iniciando repair iterativo
+[     0.0s]    Inicial: Tmax=504.4h gap=180.2% pen_cap=0.000 pen_jan=0.000 pen_tsk=0.000
+[     0.0s]    Distribuicao por sprint: s1:15 s2:15 s3:15 s4:15 s5:15
+[     0.0s]    Diagnostico: 10 alocacoes c/ B_apr>0, 0 c/ F_tech<1
+[     0.0s]    Verificacao integral (43 restricoes) da gulosa: FACTIVEL
+ Eq. kind mode     status      #viol   max_viol  descricao
+-----------------------------------------------------------------------------------------------
+   6 h    ENFORCE  OK              0     0.0000  u define tamanho de team = z
+   7 h    ENFORCE  OK              0     0.0000  sum_w = sum d.u
+   8 h    ENFORCE  OK              0     0.0000  w = sum lambda (fracao valida)
+   9 g    ENFORCE  OK              0     0.0000  y <= w (linearizacao Team Match)
+  10 g    ENFORCE  OK              0     0.0000  y <= u (linearizacao Team Match)
+  11 g    ENFORCE  OK              0     0.0000  y >= w + u - 1
+  12 h    ENFORCE  OK              0     0.0000  definition Peq (perfil medio)
+  13 g    ENFORCE  OK              0     0.0000  Dev >= Peq - 0.25
+  14 g    ENFORCE  OK              0     0.0000  Dev >= 0.25 - Peq
+  15 h    ENFORCE  OK              0     0.0000  definition P_match (Team Match)
+  16 g    ENFORCE  OK              0     0.0000  max 5 tasks por dev/sprint
+  17 h    ENFORCE  OK              0     0.0000  definition P_ctx (contexto)
+  18 h    ENFORCE  OK              0     0.0000  definition P_com (Brooks)
+  19 h    ENFORCE  OK              0     0.0000  definition Cg (load cognitiva)
+  20 h    ENFORCE  OK              0     0.0000  definition P_phi (fadiga)
+  21 h    ENFORCE  OK              0     0.0000  definition b_axis (aprendizado)
+  22 h    ENFORCE  OK              0     0.0000  definition b_dep (aprendizado)
+  23 h    ENFORCE  OK              0     0.0000  definition B_apr total
+  24 h    ENFORCE  OK              0     0.0000  definition F_total
+  25 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= M.lambda
+  26 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= m.lambda
+  27 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= F_tot - m(1-l)
+  28 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= F_tot - M(1-l)
+  29 h    ENFORCE  OK              0     0.0000  definition T_din (+ T_aux >= 0)
+  30 h    ENFORCE  OK              0     0.0000  backlog complete (fracoes = 12/12)
+  31 h    ENFORCE  OK              0     0.0000  z = sum x
+  32 h    ENFORCE  OK              0     0.0000  exatamente 1 sprint por task
+  33 g    ENFORCE  OK              0     0.0000  inicio apos abertura da sprint
+  34 g    ENFORCE  OK              0     0.0000  Dur >= T_din de todos os devs
+  35 g    ENFORCE  OK              0     0.0000  termino dentro da janela da sprint
+  36 g    ENFORCE  OK              0     0.0000  prazo individual da task
+  37 g    WARN     OK              0     0.0000  coverage de skills (HdT)
+  38 g    ENFORCE  OK              0     0.0000  max 4 devs por task
+  39 h    ENFORCE  OK              0     0.0000  w = sum lambda (duplicate da Eq.8)
+  40 h    ENFORCE  OK              0     0.0000  x = multiplo de 1/12
+  41 g    ENFORCE  OK              0     0.0000  precedence + Gap_prec
+  42 g    ENFORCE  OK              0     0.0000  order definida p/ pares do dev
+  43 g    ENFORCE  OK              0     0.0000  execucao serial sem overlap
+  44 g    ENFORCE  OK              0     0.0000  v <= w_j
+  45 g    ENFORCE  OK              0     0.0000  v <= w_k
+  46 h    ENFORCE  OK              0     0.0000  definition CapUtil (93.6h)
+  47 g    ENFORCE  OK              0     0.0000  capacity util por dev/sprint
+  48 g    ENFORCE  OK              0     0.0000  Tmax cobre o fim de todas as tasks
+-----------------------------------------------------------------------------------------------
+FACTIVEL (modes ENFORCE): SIM
+[     1.2s]    VND inicial: Tmax=504.4h gap=180.2% feasible=SIM
+[     6.1s]       [melhoria] it=1 k2  Tmax=503.6h  gap=179.8%  t=6s
+[    74.1s]       [melhoria] it=9 k7  Tmax=503.2h  gap=179.5%  t=74s
+[   200.9s]    [MIP] varredura final fix-and-optimize (POPMUSIC)...
+[   211.0s] [mip final-sweep] strat=makespan_tail free=10 triples=345 v=3216 status=9 objGurobi=503.2 t=10.1s
+
+======================================================================
+  RESULTADO — Cenario_1_Maratona_Multitarefa
+======================================================================
+[   211.0s]    Tmax=503.2h | gap=179.5% | t=211.0s | iteracoes=18 | candidatos rejeitados por infactibilidade=0
+[   211.0s]    Verificacao final (43 restricoes): FACTIVEL
+
+RELATORIO FINAL DAS 43 CONSTRAINTS:
+ Eq. kind mode     status      #viol   max_viol  descricao
+-----------------------------------------------------------------------------------------------
+   6 h    ENFORCE  OK              0     0.0000  u define tamanho de team = z
+   7 h    ENFORCE  OK              0     0.0000  sum_w = sum d.u
+   8 h    ENFORCE  OK              0     0.0000  w = sum lambda (fracao valida)
+   9 g    ENFORCE  OK              0     0.0000  y <= w (linearizacao Team Match)
+  10 g    ENFORCE  OK              0     0.0000  y <= u (linearizacao Team Match)
+  11 g    ENFORCE  OK              0     0.0000  y >= w + u - 1
+  12 h    ENFORCE  OK              0     0.0000  definition Peq (perfil medio)
+  13 g    ENFORCE  OK              0     0.0000  Dev >= Peq - 0.25
+  14 g    ENFORCE  OK              0     0.0000  Dev >= 0.25 - Peq
+  15 h    ENFORCE  OK              0     0.0000  definition P_match (Team Match)
+  16 g    ENFORCE  OK              0     0.0000  max 5 tasks por dev/sprint
+  17 h    ENFORCE  OK              0     0.0000  definition P_ctx (contexto)
+  18 h    ENFORCE  OK              0     0.0000  definition P_com (Brooks)
+  19 h    ENFORCE  OK              0     0.0000  definition Cg (load cognitiva)
+  20 h    ENFORCE  OK              0     0.0000  definition P_phi (fadiga)
+  21 h    ENFORCE  OK              0     0.0000  definition b_axis (aprendizado)
+  22 h    ENFORCE  OK              0     0.0000  definition b_dep (aprendizado)
+  23 h    ENFORCE  OK              0     0.0000  definition B_apr total
+  24 h    ENFORCE  OK              0     0.0000  definition F_total
+  25 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= M.lambda
+  26 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= m.lambda
+  27 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= F_tot - m(1-l)
+  28 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= F_tot - M(1-l)
+  29 h    ENFORCE  OK              0     0.0000  definition T_din (+ T_aux >= 0)
+  30 h    ENFORCE  OK              0     0.0000  backlog complete (fracoes = 12/12)
+  31 h    ENFORCE  OK              0     0.0000  z = sum x
+  32 h    ENFORCE  OK              0     0.0000  exatamente 1 sprint por task
+  33 g    ENFORCE  OK              0     0.0000  inicio apos abertura da sprint
+  34 g    ENFORCE  OK              0     0.0000  Dur >= T_din de todos os devs
+  35 g    ENFORCE  OK              0     0.0000  termino dentro da janela da sprint
+  36 g    ENFORCE  OK              0     0.0000  prazo individual da task
+  37 g    WARN     AVISO          12     1.0000  coverage de skills (HdT)
+      -> T21: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T25: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T34: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T53: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T54: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+  38 g    ENFORCE  OK              0     0.0000  max 4 devs por task
+  39 h    ENFORCE  OK              0     0.0000  w = sum lambda (duplicate da Eq.8)
+  40 h    ENFORCE  OK              0     0.0000  x = multiplo de 1/12
+  41 g    ENFORCE  OK              0     0.0000  precedence + Gap_prec
+  42 g    ENFORCE  OK              0     0.0000  order definida p/ pares do dev
+  43 g    ENFORCE  OK              0     0.0000  execucao serial sem overlap
+  44 g    ENFORCE  OK              0     0.0000  v <= w_j
+  45 g    ENFORCE  OK              0     0.0000  v <= w_k
+  46 h    ENFORCE  OK              0     0.0000  definition CapUtil (93.6h)
+  47 g    ENFORCE  OK              0     0.0000  capacity util por dev/sprint
+  48 g    ENFORCE  OK              0     0.0000  Tmax cobre o fim de todas as tasks
+-----------------------------------------------------------------------------------------------
+FACTIVEL (modes ENFORCE): SIM
+[   211.0s]    Saida: data\results\vns_v2\Cenario_1_Maratona_Multitarefa/allocations.csv, convergence_log.csv, vnd_log.csv, submip_log.csv, debug_log.txt, constraints_report.txt
+[   211.0s]    Matheuristica: 1 chamadas de sub-MIP, 0 melhorias aceitas (Gurobi)

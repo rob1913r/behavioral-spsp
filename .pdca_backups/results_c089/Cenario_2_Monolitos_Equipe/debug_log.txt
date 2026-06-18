@@ -1,0 +1,193 @@
+
+======================================================================
+  VNS — Cenario_2_Monolitos_Equipe
+======================================================================
+[     0.0s] [VNS] N=12 M=4 S_max=5 | LB=131.2h | T_limit=180s | seed=42
+PARAMETROS DO MODELO: alpha_axis=0.05 lmbda_apr=0.8 alpha_dep=0.2 lmbda_dep=0.6 l_fat=0.1 phi_fat=9.0 CapUtil=93.60000000000001 H_span=112 Setup=2.0
+PARAMETROS DE BUSCA: T_MULT=0.5 K_MAX=10 ILS_AFTER=32 VND_FRAC=0.4 F_PESS=2.0 LAM=(1.0,1.0,1.0)
+[     0.0s] [gulosa] fase 1 concluida — iniciando repair iterativo
+[     0.0s] [gulosa-monoliths v2] monos=[T0->Dev_0@s3, T4->Dev_1@s4, T8->Dev_2@s4] warmups=7 free_tasks=2 pen_cap=13024.4 pen_jan=11463.2
+[     0.3s]    Start 'gulosa': Tmax=670.0h fp=25385.4 (infeasible)
+[     0.5s]    Start 'gulosa-monoliths': Tmax=614.2h fp=13514.5 (infeasible)
+[     0.5s]    Multi-start: vencedor = 'gulosa-monoliths'
+[     0.5s]    Inicial: Tmax=614.2h gap=368.0% pen_cap=6798.007 pen_jan=6073.567 pen_tsk=0.000
+[     0.5s]    Distribuicao por sprint: s1:2 s2:3 s3:2 s4:4 s5:1
+[     0.5s]    Diagnostico: 17 alocacoes c/ B_apr>0, 18 c/ F_tech<1
+[     0.5s]    Verificacao integral (43 restricoes) da gulosa: INFACTIVEL — Eq.35 termino dentro da janela da sprint (1 viol, max 54.228), Eq.47 capacity util por dev/sprint (1 viol, max 72.628)
+ Eq. kind mode     status      #viol   max_viol  descricao
+-----------------------------------------------------------------------------------------------
+   6 h    ENFORCE  OK              0     0.0000  u define tamanho de team = z
+   7 h    ENFORCE  OK              0     0.0000  sum_w = sum d.u
+   8 h    ENFORCE  OK              0     0.0000  w = sum lambda (fracao valida)
+   9 g    ENFORCE  OK              0     0.0000  y <= w (linearizacao Team Match)
+  10 g    ENFORCE  OK              0     0.0000  y <= u (linearizacao Team Match)
+  11 g    ENFORCE  OK              0     0.0000  y >= w + u - 1
+  12 h    ENFORCE  OK              0     0.0000  definition Peq (perfil medio)
+  13 g    ENFORCE  OK              0     0.0000  Dev >= Peq - 0.25
+  14 g    ENFORCE  OK              0     0.0000  Dev >= 0.25 - Peq
+  15 h    ENFORCE  OK              0     0.0000  definition P_match (Team Match)
+  16 g    ENFORCE  OK              0     0.0000  max 5 tasks por dev/sprint
+  17 h    ENFORCE  OK              0     0.0000  definition P_ctx (contexto)
+  18 h    ENFORCE  OK              0     0.0000  definition P_com (Brooks)
+  19 h    ENFORCE  OK              0     0.0000  definition Cg (load cognitiva)
+  20 h    ENFORCE  OK              0     0.0000  definition P_phi (fadiga)
+  21 h    ENFORCE  OK              0     0.0000  definition b_axis (aprendizado)
+  22 h    ENFORCE  OK              0     0.0000  definition b_dep (aprendizado)
+  23 h    ENFORCE  OK              0     0.0000  definition B_apr total
+  24 h    ENFORCE  OK              0     0.0000  definition F_total
+  25 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= M.lambda
+  26 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= m.lambda
+  27 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= F_tot - m(1-l)
+  28 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= F_tot - M(1-l)
+  29 h    ENFORCE  OK              0     0.0000  definition T_din (+ T_aux >= 0)
+  30 h    ENFORCE  OK              0     0.0000  backlog complete (fracoes = 12/12)
+  31 h    ENFORCE  OK              0     0.0000  z = sum x
+  32 h    ENFORCE  OK              0     0.0000  exatamente 1 sprint por task
+  33 g    ENFORCE  OK              0     0.0000  inicio apos abertura da sprint
+  34 g    ENFORCE  OK              0     0.0000  Dur >= T_din de todos os devs
+  35 g    ENFORCE  VIOLADA         1    54.2283  termino dentro da janela da sprint
+      -> T8: termina em 614.2h mas a sprint 5 fecha em 560h  [viol=54.2283]
+  36 g    ENFORCE  OK              0     0.0000  prazo individual da task
+  37 g    WARN     AVISO           5     1.0000  coverage de skills (HdT)
+      -> T0: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T3: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T4: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T7: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T8: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+  38 g    ENFORCE  OK              0     0.0000  max 4 devs por task
+  39 h    ENFORCE  OK              0     0.0000  w = sum lambda (duplicate da Eq.8)
+  40 h    ENFORCE  OK              0     0.0000  x = multiplo de 1/12
+  41 g    ENFORCE  OK              0     0.0000  precedence + Gap_prec
+  42 g    ENFORCE  OK              0     0.0000  order definida p/ pares do dev
+  43 g    ENFORCE  OK              0     0.0000  execucao serial sem overlap
+  44 g    ENFORCE  OK              0     0.0000  v <= w_j
+  45 g    ENFORCE  OK              0     0.0000  v <= w_k
+  46 h    ENFORCE  OK              0     0.0000  definition CapUtil (93.6h)
+  47 g    ENFORCE  VIOLADA         1    72.6283  capacity util por dev/sprint
+      -> Dev_2/Sprint5: load 166.23h > CapUtil 93.60000000000001h  [viol=72.6283]
+  48 g    ENFORCE  OK              0     0.0000  Tmax cobre o fim de todas as tasks
+-----------------------------------------------------------------------------------------------
+FACTIVEL (modes ENFORCE): NAO
+[     0.5s]    [AVISO] Gulosa infeasible — aplicando repair complete
+[     0.5s]    Apos repair: AINDA INFACTIVEL — Eq.35 termino dentro da janela da sprint (1 viol, max 54.228), Eq.47 capacity util por dev/sprint (1 viol, max 72.628)
+[     0.6s]    VND inicial: Tmax=614.2h gap=368.0% feasible=NAO
+[     0.8s]       [melhoria] it=1 k5  Tmax=539.0h  gap=310.6%  t=1s
+[     1.0s]       [melhoria] it=2 k9  Tmax=536.2h  gap=308.6%  t=1s
+[     1.5s]       [compressao] it=4 k1  Tmax=536.2h  gap=308.6%  t=1s
+[     2.9s]       [compressao] it=8 k4  Tmax=536.2h  gap=308.6%  t=3s
+[     4.0s]    [REJEITADA] iteracao 12 (k=8): o algoritmo ia pular para uma nova solucao (fp=467.6 < best=557.8), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 129.684), Eq.47 capacity util por dev/sprint (1 viol, max 148.084)
+[     7.4s]    [REJEITADA] iteracao 25 (k=9): o algoritmo ia pular para uma nova solucao (fp=527.0 < best=557.8), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 46.461), Eq.47 capacity util por dev/sprint (2 viol, max 64.861)
+[     7.6s]       [compressao] it=26 k6  Tmax=536.2h  gap=308.6%  t=8s
+[     8.4s]    [REJEITADA] iteracao 28 (k=10): o algoritmo ia pular para uma nova solucao (fp=525.7 < best=557.8), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 46.461), Eq.47 capacity util por dev/sprint (2 viol, max 64.861)
+[    10.1s]    [REJEITADA] iteracao 34 (k=1): o algoritmo ia pular para uma nova solucao (fp=467.7 < best=557.8), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 129.684), Eq.47 capacity util por dev/sprint (1 viol, max 148.084)
+[    13.2s]    [REJEITADA] iteracao 43 (k=7): o algoritmo ia pular para uma nova solucao (fp=469.2 < best=557.8), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 129.684), Eq.47 capacity util por dev/sprint (1 viol, max 148.084)
+[    15.7s]       [compressao] it=51 k3  Tmax=536.2h  gap=308.6%  t=16s
+[    16.1s]       [compressao] it=53 k10  Tmax=536.2h  gap=308.6%  t=16s
+[    20.5s]    [REJEITADA] iteracao 65 (k=5): o algoritmo ia pular para uma nova solucao (fp=472.2 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 129.684), Eq.47 capacity util por dev/sprint (1 viol, max 148.084)
+[    27.1s]    [REJEITADA] iteracao 80 (k=6): o algoritmo ia pular para uma nova solucao (fp=489.9 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 129.684), Eq.47 capacity util por dev/sprint (2 viol, max 148.084)
+[    28.9s] [ILS it85] restart por estagnacao (32 iteracoes sem melhora)
+[    29.9s]    [REJEITADA] iteracao 88 (k=9): o algoritmo ia pular para uma nova solucao (fp=533.7 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (1 viol, max 33.247), Eq.47 capacity util por dev/sprint (3 viol, max 51.647)
+[    36.8s]    [REJEITADA] iteracao 112 (k=4): o algoritmo ia pular para uma nova solucao (fp=470.4 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 129.684), Eq.47 capacity util por dev/sprint (1 viol, max 148.084)
+[    38.8s] [ILS it117] restart TRAJETORIA NOVA (gulosa + VND fresco, sub-seed 2)
+[    38.8s] [gulosa] fase 1 concluida — iniciando repair iterativo
+[    40.0s]       [compressao] it=119 k3  Tmax=536.2h  gap=308.6%  t=40s
+[    43.4s]    [REJEITADA] iteracao 130 (k=8): o algoritmo ia pular para uma nova solucao (fp=536.8 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 129.684), Eq.47 capacity util por dev/sprint (2 viol, max 148.084)
+[    44.9s]    [REJEITADA] iteracao 135 (k=6): o algoritmo ia pular para uma nova solucao (fp=515.2 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 33.247), Eq.47 capacity util por dev/sprint (2 viol, max 51.647)
+[    49.7s] [ILS it151] restart por estagnacao (32 iteracoes sem melhora)
+[    55.5s]    [REJEITADA] iteracao 168 (k=4): o algoritmo ia pular para uma nova solucao (fp=467.9 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 129.684), Eq.47 capacity util por dev/sprint (1 viol, max 148.084)
+[    56.6s]    [REJEITADA] iteracao 171 (k=4): o algoritmo ia pular para uma nova solucao (fp=525.1 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 127.212), Eq.47 capacity util por dev/sprint (1 viol, max 145.612)
+[    61.0s] [ILS it183] restart TRAJETORIA NOVA (gulosa + VND fresco, sub-seed 4)
+[    61.0s] [gulosa] fase 1 concluida — iniciando repair iterativo
+[    61.9s]    [REJEITADA] iteracao 185 (k=4): o algoritmo ia pular para uma nova solucao (fp=533.1 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (1 viol, max 33.247), Eq.47 capacity util por dev/sprint (3 viol, max 51.647)
+[    63.5s]    [REJEITADA] iteracao 191 (k=4): o algoritmo ia pular para uma nova solucao (fp=529.8 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (1 viol, max 33.247), Eq.47 capacity util por dev/sprint (2 viol, max 51.647)
+[    64.7s]    [REJEITADA] iteracao 196 (k=7): o algoritmo ia pular para uma nova solucao (fp=542.4 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (1 viol, max 46.461), Eq.47 capacity util por dev/sprint (3 viol, max 64.861)
+[    68.3s]    [REJEITADA] iteracao 207 (k=7): o algoritmo ia pular para uma nova solucao (fp=490.2 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 129.684), Eq.47 capacity util por dev/sprint (2 viol, max 148.084)
+[    70.9s] [ILS it215] restart por estagnacao (32 iteracoes sem melhora)
+[    71.0s]    [REJEITADA-ILS] iteracao 215: candidato do restart infeasible: Eq.35 termino dentro da janela da sprint (1 viol, max 33.247), Eq.47 capacity util por dev/sprint (2 viol, max 51.647)
+[    76.5s]    [REJEITADA] iteracao 231 (k=8): o algoritmo ia pular para uma nova solucao (fp=490.8 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (1 viol, max 44.119), Eq.47 capacity util por dev/sprint (3 viol, max 62.519)
+[    79.0s]    [REJEITADA] iteracao 239 (k=7): o algoritmo ia pular para uma nova solucao (fp=532.0 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (1 viol, max 33.247), Eq.47 capacity util por dev/sprint (3 viol, max 51.647)
+[    81.0s] [ILS it247] restart TRAJETORIA NOVA (gulosa + VND fresco, sub-seed 6)
+[    81.0s] [gulosa] fase 1 concluida — iniciando repair iterativo
+[    81.8s]    [REJEITADA] iteracao 248 (k=5): o algoritmo ia pular para uma nova solucao (fp=515.3 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 33.247), Eq.47 capacity util por dev/sprint (2 viol, max 51.647)
+[    83.5s]    [REJEITADA] iteracao 253 (k=6): o algoritmo ia pular para uma nova solucao (fp=469.5 < best=556.9), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 129.684), Eq.47 capacity util por dev/sprint (1 viol, max 148.084)
+[    90.9s] [ILS it279] restart por estagnacao (32 iteracoes sem melhora)
+[    93.1s]       [melhoria] it=284 k3  Tmax=480.8h  gap=266.3%  t=93s
+[    94.5s]    [REJEITADA] iteracao 287 (k=6): o algoritmo ia pular para uma nova solucao (fp=470.6 < best=505.1), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 129.684), Eq.47 capacity util por dev/sprint (1 viol, max 148.084)
+[    96.6s]    [REJEITADA] iteracao 293 (k=8): o algoritmo ia pular para uma nova solucao (fp=471.8 < best=505.1), mas mesmo apos repair ela estava INFACTIVEL devido a: Eq.35 termino dentro da janela da sprint (2 viol, max 129.684), Eq.47 capacity util por dev/sprint (1 viol, max 148.084)
+[    98.9s]       [melhoria] it=299 k1  Tmax=425.2h  gap=224.0%  t=99s
+[   107.3s] [ILS it331] restart TRAJETORIA NOVA (gulosa + VND fresco, sub-seed 8)
+[   107.3s] [gulosa] fase 1 concluida — iniciando repair iterativo
+[   118.1s] [ILS it364] restart por estagnacao (33 iteracoes sem melhora)
+[   118.7s]       [compressao] it=366 k7  Tmax=425.2h  gap=224.0%  t=119s
+[   130.4s] [ILS it398] restart TRAJETORIA NOVA (gulosa + VND fresco, sub-seed 10)
+[   130.4s] [gulosa] fase 1 concluida — iniciando repair iterativo
+[   140.2s] [ILS it430] restart por estagnacao (32 iteracoes sem melhora)
+[   149.6s] [ILS it462] restart TRAJETORIA NOVA (gulosa + VND fresco, sub-seed 12)
+[   149.6s] [gulosa] fase 1 concluida — iniciando repair iterativo
+[   159.1s] [ILS it494] restart por estagnacao (32 iteracoes sem melhora)
+[   159.6s] [gate it496] candidato feasible mas Tmax=428.6 >= best=425.2
+[   162.1s]    [MIP] varredura final fix-and-optimize (POPMUSIC)...
+[   174.3s] [mip final-sweep] strat=makespan_tail free=10 triples=201 v=1830 status=9 objGurobi=425.2 t=12.2s
+[   180.2s] [mip final-sweep] strat=critical_chain free=10 triples=201 v=1830 status=9 objGurobi=425.2 t=5.9s
+
+======================================================================
+  RESULTADO — Cenario_2_Monolitos_Equipe
+======================================================================
+[   180.2s]    Tmax=425.2h | gap=224.0% | t=180.2s | iteracoes=504 | candidatos rejeitados por infactibilidade=24
+[   180.2s]    Verificacao final (43 restricoes): FACTIVEL
+
+RELATORIO FINAL DAS 43 CONSTRAINTS:
+ Eq. kind mode     status      #viol   max_viol  descricao
+-----------------------------------------------------------------------------------------------
+   6 h    ENFORCE  OK              0     0.0000  u define tamanho de team = z
+   7 h    ENFORCE  OK              0     0.0000  sum_w = sum d.u
+   8 h    ENFORCE  OK              0     0.0000  w = sum lambda (fracao valida)
+   9 g    ENFORCE  OK              0     0.0000  y <= w (linearizacao Team Match)
+  10 g    ENFORCE  OK              0     0.0000  y <= u (linearizacao Team Match)
+  11 g    ENFORCE  OK              0     0.0000  y >= w + u - 1
+  12 h    ENFORCE  OK              0     0.0000  definition Peq (perfil medio)
+  13 g    ENFORCE  OK              0     0.0000  Dev >= Peq - 0.25
+  14 g    ENFORCE  OK              0     0.0000  Dev >= 0.25 - Peq
+  15 h    ENFORCE  OK              0     0.0000  definition P_match (Team Match)
+  16 g    ENFORCE  OK              0     0.0000  max 5 tasks por dev/sprint
+  17 h    ENFORCE  OK              0     0.0000  definition P_ctx (contexto)
+  18 h    ENFORCE  OK              0     0.0000  definition P_com (Brooks)
+  19 h    ENFORCE  OK              0     0.0000  definition Cg (load cognitiva)
+  20 h    ENFORCE  OK              0     0.0000  definition P_phi (fadiga)
+  21 h    ENFORCE  OK              0     0.0000  definition b_axis (aprendizado)
+  22 h    ENFORCE  OK              0     0.0000  definition b_dep (aprendizado)
+  23 h    ENFORCE  OK              0     0.0000  definition B_apr total
+  24 h    ENFORCE  OK              0     0.0000  definition F_total
+  25 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= M.lambda
+  26 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= m.lambda
+  27 g    ENFORCE  OK              0     0.0000  linearizacao gamma <= F_tot - m(1-l)
+  28 g    ENFORCE  OK              0     0.0000  linearizacao gamma >= F_tot - M(1-l)
+  29 h    ENFORCE  OK              0     0.0000  definition T_din (+ T_aux >= 0)
+  30 h    ENFORCE  OK              0     0.0000  backlog complete (fracoes = 12/12)
+  31 h    ENFORCE  OK              0     0.0000  z = sum x
+  32 h    ENFORCE  OK              0     0.0000  exatamente 1 sprint por task
+  33 g    ENFORCE  OK              0     0.0000  inicio apos abertura da sprint
+  34 g    ENFORCE  OK              0     0.0000  Dur >= T_din de todos os devs
+  35 g    ENFORCE  OK              0     0.0000  termino dentro da janela da sprint
+  36 g    ENFORCE  OK              0     0.0000  prazo individual da task
+  37 g    WARN     AVISO           5     1.0000  coverage de skills (HdT)
+      -> T0: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T4: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T6: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T7: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+      -> T8: nenhum dev alocado atende todos os requisitos tecnicos  [viol=1.0000]
+  38 g    ENFORCE  OK              0     0.0000  max 4 devs por task
+  39 h    ENFORCE  OK              0     0.0000  w = sum lambda (duplicate da Eq.8)
+  40 h    ENFORCE  OK              0     0.0000  x = multiplo de 1/12
+  41 g    ENFORCE  OK              0     0.0000  precedence + Gap_prec
+  42 g    ENFORCE  OK              0     0.0000  order definida p/ pares do dev
+  43 g    ENFORCE  OK              0     0.0000  execucao serial sem overlap
+  44 g    ENFORCE  OK              0     0.0000  v <= w_j
+  45 g    ENFORCE  OK              0     0.0000  v <= w_k
+  46 h    ENFORCE  OK              0     0.0000  definition CapUtil (93.6h)
+  47 g    ENFORCE  OK              0     0.0000  capacity util por dev/sprint
+  48 g    ENFORCE  OK              0     0.0000  Tmax cobre o fim de todas as tasks
+-----------------------------------------------------------------------------------------------
+FACTIVEL (modes ENFORCE): SIM
+[   180.3s]    Saida: data\results\vns_v2\Cenario_2_Monolitos_Equipe/allocations.csv, convergence_log.csv, vnd_log.csv, submip_log.csv, debug_log.txt, constraints_report.txt
+[   180.3s]    Matheuristica: 1 chamadas de sub-MIP, 0 melhorias aceitas (Gurobi)
