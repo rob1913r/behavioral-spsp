@@ -58,8 +58,11 @@ LANG_STR = {
         'g07_title': "Evolução do Cronograma sob Ruído",
         'g08_title': "Variância do Makespan nos Cenários Críticos",
         'g09_title': "Crescimento do Erro Comportamental (EC)",
-        'x_scen': "Cenário Comportamental", 'y_mksp': "Makespan (Dias)", 
+        'x_scen': "Cenário Comportamental", 'y_mksp': "Makespan (Dias)",
         'y_mksp_avg': "Makespan Médio (Dias)", 'y_ec': "Erro Comportamental (EC) Médio",
+        # Rótulos do eixo X dos gráficos de cenário (G07, G08, G09)
+        'scen_map': {"0_Baseline": "Baseline", "1_Natural": "Natural",
+                     "2_Critico": "Crítico", "3_Extremo": "Extremo"},
         # G10 & G11
         'g10_title': "Matriz de Planejamento Tático de Capacidade",
         'g11_title': "A Assíntota da Lei de Brooks (N=50)",
@@ -102,8 +105,11 @@ LANG_STR = {
         'g07_title': "Schedule Evolution under Noise",
         'g08_title': "Makespan Variance in Critical Scenarios",
         'g09_title': "Growth of Behavioral Error (EC)",
-        'x_scen': "Behavioral Scenario", 'y_mksp': "Makespan (Days)", 
+        'x_scen': "Behavioral Scenario", 'y_mksp': "Makespan (Days)",
         'y_mksp_avg': "Average Makespan (Days)", 'y_ec': "Average Behavioral Error (BE)",
+        # X-axis tick labels of the scenario charts (G07, G08, G09)
+        'scen_map': {"0_Baseline": "Baseline", "1_Natural": "Natural",
+                     "2_Critico": "Critical", "3_Extremo": "Extreme"},
         # G10 & G11
         'g10_title': "Tactical Capacity Planning Matrix",
         'g11_title': "Brooks's Law Asymptote (N=50)",
@@ -117,6 +123,18 @@ LANG_STR = {
         'x_tech': "Technical Proficiency Level"
     }
 }
+
+def apply_scen_labels(ax, strings):
+    """Traduz os rótulos do eixo X dos cenários (ex.: '2_Critico' -> 'Critical').
+
+    A tradução é feita sobre os rótulos já renderizados, preservando as posições
+    e a ordem definidas pelo seaborn em cada tipo de gráfico.
+    """
+    mapping = strings['scen_map']
+    labels = [mapping.get(t.get_text(), t.get_text()) for t in ax.get_xticklabels()]
+    ax.set_xticks(ax.get_xticks())
+    ax.set_xticklabels(labels)
+
 
 print(f"\nIniciando pipeline de geração de gráficos...")
 
@@ -256,26 +274,29 @@ for lang in ['pt', 'en']:
         df_exp2 = df[(df['group'] == 'Exp2_Behavioral') & (df['feasible'] == 1)]
         if not df_exp2.empty:
             plt.figure(figsize=(8, 5), dpi=300)
-            sns.lineplot(data=df_exp2, x="Cenario", y="mksp", marker="o", color="darkorange", linewidth=2.5)
+            ax = sns.lineplot(data=df_exp2, x="Cenario", y="mksp", marker="o", color="darkorange", linewidth=2.5)
             plt.title(S['g07_title'], fontweight="bold")
             plt.xlabel(S['x_scen'])
             plt.ylabel(S['y_mksp_avg'])
+            apply_scen_labels(ax, S)
             plt.tight_layout()
             plt.savefig(os.path.join(OUTPUT_DIR, "G07_Behavioral_Line_Makespan.eps"))
 
             plt.figure(figsize=(8, 5), dpi=300)
-            sns.boxplot(data=df_exp2, x="Cenario", y="mksp", palette="Oranges")
+            ax = sns.boxplot(data=df_exp2, x="Cenario", y="mksp", palette="Oranges")
             plt.title(S['g08_title'], fontweight="bold")
             plt.xlabel(S['x_scen'])
             plt.ylabel(S['y_mksp'])
+            apply_scen_labels(ax, S)
             plt.tight_layout()
             plt.savefig(os.path.join(OUTPUT_DIR, "G08_Behavioral_Boxplot_Makespan.eps"))
 
             plt.figure(figsize=(8, 5), dpi=300)
-            sns.barplot(data=df_exp2, x="Cenario", y="avg_EC", palette="autumn", ci="sd")
+            ax = sns.barplot(data=df_exp2, x="Cenario", y="avg_EC", palette="autumn", ci="sd")
             plt.title(S['g09_title'], fontweight="bold")
             plt.xlabel(S['x_scen'])
             plt.ylabel(S['y_ec'])
+            apply_scen_labels(ax, S)
             plt.tight_layout()
             plt.savefig(os.path.join(OUTPUT_DIR, "G09_Behavioral_Bar_EC.eps"))
 
